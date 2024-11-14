@@ -1,0 +1,24 @@
+@import '/vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.card img {
+    border-radius: 8px 8px 0 0;
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-body {
+    background-color: #f9f9f9;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+}
