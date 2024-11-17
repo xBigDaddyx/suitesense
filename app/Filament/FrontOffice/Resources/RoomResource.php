@@ -40,7 +40,7 @@ class RoomResource extends Resource
     }
     public static function getGloballySearchableAttributes(): array
     {
-        return ['name', 'type'];
+        return ['name', 'price'];
     }
     protected function getRedirectUrl(): string
     {
@@ -50,7 +50,7 @@ class RoomResource extends Resource
     {
 
         return [
-            'Room Type' => $record->type,
+            'Room Type' => $record->roomType->type,
             'Price' => trans('frontOffice.room.pricePrefix') . ' ' . $record->price,
             'Is Available' => $record->is_available ? 'Yes' : 'No',
         ];
@@ -58,18 +58,18 @@ class RoomResource extends Resource
     public static function getGlobalSearchResultActions(Model $record): array
     {
         return [
-            Forms\Components\Actions\Action::make('edit')
-                ->icon('tabler-pencil')
-                ->color('warning')
-                ->url(static::getUrl('edit', ['record' => $record]), shouldOpenInNewTab: true)
-                ->authorize(fn(): bool => auth()->user()->can('view_room'))
-                ->modalWidth(MaxWidth::FiveExtraLarge),
-            Forms\Components\Actions\Action::make('view')
-                ->icon('tabler-eye')
-                ->url(static::getUrl('view', ['record' => $record]))
-                ->color('info')
-                ->authorize(fn(): bool => auth()->user()->can('update_room') || auth()->user()->can('edit_room'))
-                ->modalWidth(MaxWidth::FiveExtraLarge),
+            // Forms\Components\Actions\Action::make('edit')
+            //     ->icon('tabler-pencil')
+            //     ->color('warning')
+            //     ->url(static::getUrl('edit', ['record' => $record]), shouldOpenInNewTab: true)
+            //     ->authorize(fn(): bool => auth()->user()->can('view_room'))
+            //     ->modalWidth(MaxWidth::FiveExtraLarge),
+            // Forms\Components\Actions\Action::make('view')
+            //     ->icon('tabler-eye')
+            //     ->url(static::getUrl('view', ['record' => $record]))
+            //     ->color('info')
+            //     ->authorize(fn(): bool => auth()->user()->can('update_room') || auth()->user()->can('edit_room'))
+            //     ->modalWidth(MaxWidth::FiveExtraLarge),
 
         ];
     }

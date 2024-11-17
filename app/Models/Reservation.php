@@ -32,6 +32,13 @@ class Reservation extends Model
         });
     }
     protected $fillable = [
+        'guest_check_in_at',
+        'guest_check_out_at',
+        'guest_status',
+        'checked_in_by',
+        'checked_out_by',
+        'reservation_source',
+        'has_payment',
         'estimate_arrival',
         'room_id',
         'guest_id',
@@ -41,6 +48,11 @@ class Reservation extends Model
         'number',
         'number_series',
         'number_reservation',
+    ];
+    protected $casts = [
+        'has_payment' => 'boolean',
+        'estimate_arrival' => 'datetime',
+
     ];
     public function getTotalNightsAttribute()
     {

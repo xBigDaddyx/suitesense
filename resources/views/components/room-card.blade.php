@@ -4,14 +4,10 @@
         {{ $room->name }}
     </x-slot>
     <x-slot name="headerEnd">
-        <x-filament::button icon="tabler-arrow-right">
-            Book Now
+        <x-filament::button icon="tabler-calendar" tag="a"
+            href="{{ route('filament.frontOffice.resources.rooms.manageReservations', ['record' => $room->id, 'tenant' => \Filament\Facades\Filament::getTenant()]) }}">
+            Reservation
         </x-filament::button>
-        <x-filament::badge color="primary" href="{{ ManageReservation }}">
-            {{ $room->roomType->name }}
-        </x-filament::badge>
-
-
     </x-slot>
     <strong>Price:</strong> ${{ $room->price }} <br>
     <strong>Status:</strong> {{ $room->is_available ? 'Available' : 'Not Available' }}

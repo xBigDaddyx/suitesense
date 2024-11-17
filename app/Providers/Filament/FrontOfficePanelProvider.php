@@ -44,7 +44,7 @@ class FrontOfficePanelProvider extends PanelProvider
                 \Saade\FilamentFullCalendar\FilamentFullCalendarPlugin::make(),
             ])
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => '#FBAC08',
             ])
             ->discoverResources(in: app_path('Filament/FrontOffice/Resources'), for: 'App\\Filament\\FrontOffice\\Resources')
             ->discoverPages(in: app_path('Filament/FrontOffice/Pages'), for: 'App\\Filament\\FrontOffice\\Pages')

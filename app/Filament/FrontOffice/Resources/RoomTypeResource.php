@@ -35,7 +35,7 @@ class RoomTypeResource extends Resource
     }
     public static function getGloballySearchableAttributes(): array
     {
-        return ['name', 'type'];
+        return ['name', 'description'];
     }
     protected function getRedirectUrl(): string
     {
@@ -45,25 +45,25 @@ class RoomTypeResource extends Resource
     {
 
         return [
-            'Room Type' => $record->type,
+            'Room Type' => $record->name,
             'Description' => $record->description,
         ];
     }
     public static function getGlobalSearchResultActions(Model $record): array
     {
         return [
-            Forms\Components\Actions\Action::make('edit')
-                ->icon('tabler-pencil')
-                ->color('warning')
-                ->url(static::getUrl('edit', ['record' => $record]), shouldOpenInNewTab: true)
-                ->authorize(fn(): bool => auth()->user()->can('view_room'))
-                ->modalWidth(MaxWidth::FiveExtraLarge),
-            Forms\Components\Actions\Action::make('view')
-                ->icon('tabler-eye')
-                ->url(static::getUrl('view', ['record' => $record]))
-                ->color('info')
-                ->authorize(fn(): bool => auth()->user()->can('update_room') || auth()->user()->can('edit_room'))
-                ->modalWidth(MaxWidth::FiveExtraLarge),
+            // Forms\Components\Actions\Action::make('edit')
+            //     ->icon('tabler-pencil')
+            //     ->color('warning')
+            //     ->url(static::getUrl('edit', ['record' => $record]), shouldOpenInNewTab: true)
+            //     ->authorize(fn(): bool => auth()->user()->can('view_room'))
+            //     ->modalWidth(MaxWidth::FiveExtraLarge),
+            // Forms\Components\Actions\Action::make('view')
+            //     ->icon('tabler-eye')
+            //     ->url(static::getUrl('view', ['record' => $record]))
+            //     ->color('info')
+            //     ->authorize(fn(): bool => auth()->user()->can('update_room') || auth()->user()->can('edit_room'))
+            //     ->modalWidth(MaxWidth::FiveExtraLarge),
 
         ];
     }

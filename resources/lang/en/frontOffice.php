@@ -73,19 +73,25 @@ return [
         'hasPaymentLabel' => 'Has Payment?',
         'numberLabel' => 'Number',
         'priceLabel' => 'Price',
+        'pricePerNightLabel' => 'Price Per Night',
+        'reservationSourceLabel' => 'Reservation Source',
 
     ],
     'payment' => [
         'label' => 'Payments',
         'pluralLabel' => 'Payments',
         'single' => 'Payment',
-        'group' => 'Booking',
+        'group' => 'Transactions',
         'title' => 'Payments',
         'icon' => 'tabler-credit-card',
         'amountLabel' => 'Amount',
         'methodLabel' => 'Method',
         'statusLabel' => 'Status',
         'indexLabel' => 'No.',
+        'numberLabel' => 'Number',
+        'reservationNumberLabel' => 'Reservation Number',
+        'reservationLabel' => 'Reservation',
+
     ],
     'user' => [
         'label' => 'Users',

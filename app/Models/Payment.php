@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -33,7 +34,10 @@ class Payment extends Model
         'number_series',
         'number_payment',
     ];
-
+    public function scopePending(Builder $query): Builder
+    {
+        return $query->where('status', 'pending');
+    }
     public function reservation(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Reservation::class);

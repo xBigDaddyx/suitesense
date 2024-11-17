@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Reservation;
+use App\Observers\ReservationObserver;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Reservation::observe(ReservationObserver::class);
         Page::$reportValidationErrorUsing = function (ValidationException $exception) {
             Notification::make()
                 ->title($exception->getMessage())
