@@ -33,6 +33,7 @@ class Room extends Model implements HasMedia
         });
     }
     protected $fillable = [
+        'status',
         'hotel_id',
         'name',
         'room_type_id',

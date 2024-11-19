@@ -30,6 +30,7 @@ class FrontOfficePanelProvider extends PanelProvider
         return $panel
             ->id('frontOffice')
             ->path('/office/front')
+            ->databaseNotifications()
             ->viteTheme('resources/css/filament/frontOffice/theme.css')
             ->login()
             ->maxContentWidth(MaxWidth::Full)
@@ -44,7 +45,19 @@ class FrontOfficePanelProvider extends PanelProvider
                 \Saade\FilamentFullCalendar\FilamentFullCalendarPlugin::make(),
             ])
             ->colors([
-                'primary' => '#FBAC08',
+                'primary' => [
+                    '50' => '#fffcea',
+                    '100' => '#fff7c6',
+                    '200' => '#ffee87',
+                    '300' => '#ffdd49',
+                    '400' => '#ffcb1f',
+                    '500' => '#fbac08',
+                    '600' => '#de8101',
+                    '700' => '#b85a05',
+                    '800' => '#95450b',
+                    '900' => '#7b390c',
+                    '950' => '#471c01',
+                ],
             ])
             ->discoverResources(in: app_path('Filament/FrontOffice/Resources'), for: 'App\\Filament\\FrontOffice\\Resources')
             ->discoverPages(in: app_path('Filament/FrontOffice/Pages'), for: 'App\\Filament\\FrontOffice\\Pages')

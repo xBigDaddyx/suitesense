@@ -91,6 +91,8 @@ return [
         'numberLabel' => 'Number',
         'reservationNumberLabel' => 'Reservation Number',
         'reservationLabel' => 'Reservation',
+        'typeLabel' => 'Type',
+        'balanceLabel' => 'Balance',
 
     ],
     'user' => [
@@ -106,6 +108,7 @@ return [
         'genderLabel' => 'Gender',
         'addressLabel' => 'Address',
         'indexLabel' => 'No.',
+        'addressLabel' => 'Address',
     ],
     'guest' => [
         'label' => 'Guests',
@@ -119,5 +122,6 @@ return [
         'phoneLabel' => 'Phone',
         'identityNumberLabel' => 'Identity Number',
         'indexLabel' => 'No.',
+        'addressLabel' => 'Address',
     ],
 ];

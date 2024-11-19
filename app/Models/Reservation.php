@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
 use App\Enums\ReservationStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -32,6 +35,7 @@ class Reservation extends Model
         });
     }
     protected $fillable = [
+        'total_price',
         'guest_check_in_at',
         'guest_check_out_at',
         'guest_status',
@@ -48,19 +52,64 @@ class Reservation extends Model
         'number',
         'number_series',
         'number_reservation',
+        'is_completed_payment',
+        'is_extended',
     ];
     protected $casts = [
         'has_payment' => 'boolean',
         'estimate_arrival' => 'datetime',
+        'is_completed_payment' => 'boolean',
+        'is_extended' => 'boolean',
 
     ];
     public function getTotalNightsAttribute()
     {
         return number_format(Carbon::parse($this->check_in)->diffInDays(Carbon::parse($this->check_out)), 0);
     }
-    public function getTotalPriceAttribute()
+
+    public function extend($newCheckOutDate): Payment
     {
-        return $this->total_nights * $this->room->price;
+        $originalCheckOut = Carbon::parse($this->check_out);
+        $newCheckOut = Carbon::parse($newCheckOutDate);
+
+        if ($newCheckOut->lessThanOrEqualTo($originalCheckOut)) {
+            throw new \Exception('Tanggal baru harus setelah tanggal check-out asli.');
+        }
+
+        // Hitung hari tambahan
+        $additionalDays = $originalCheckOut->diffInDays($newCheckOut);
+
+        // Validasi ketersediaan kamar untuk hari tambahan
+        $isAvailable = Room::where('id', $this->room_id)
+            ->whereHas('reservations', function ($query) use ($originalCheckOut, $newCheckOut) {
+                $query->whereBetween('check_in', [$originalCheckOut, $newCheckOut])
+                    ->orWhereBetween('check_out', [$originalCheckOut, $newCheckOut]);
+            })->exists();
+        if (!$isAvailable) {
+            throw new \Exception('Kamar tidak tersedia untuk perpanjangan.');
+        }
+
+        // Hitung biaya tambahan
+        $roomPrice = $this->room->price;
+        $additionalAmount =  $roomPrice * $additionalDays;
+        // Perbarui tanggal check-out
+        $this->check_out = $newCheckOut;
+
+        // Tambahkan biaya ke total harga
+        $this->total_price += $additionalAmount;
+        $this->is_extended = true;
+        $this->save();
+
+        // Buat payment untuk perpanjangan
+        $payment = Payment::create([
+            'reservation_id' => $this->id,
+            'amount' => $additionalAmount,
+            'status' => PaymentStatus::PENDING->value,
+            'method' => PaymentMethod::CASH->value,
+            'type' => PaymentType::EXTEND->value,
+        ]);
+
+        return $payment;
     }
     public function scopePending(Builder $query): Builder
     {

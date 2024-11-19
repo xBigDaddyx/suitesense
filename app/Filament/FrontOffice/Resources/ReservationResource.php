@@ -5,18 +5,26 @@ namespace App\Filament\FrontOffice\Resources;
 use App\Enums\GuestStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
 use App\Enums\ReservationSource;
 use App\Enums\ReservationStatus;
+use App\Enums\RoomStatus;
+use App\Events\CancelReservationEvent;
+use App\Events\GuestCheckinEvent;
+use App\Events\GuestCheckoutEvent;
 use App\Filament\FrontOffice\Resources\ReservationResource\Pages;
 use App\Filament\FrontOffice\Resources\ReservationResource\RelationManagers;
 use App\Filament\FrontOffice\Resources\RoomResource\Pages\ManageReservations;
 use App\Models\Guest;
+use App\Models\Payment;
 use App\Models\Reservation;
 use App\Models\Room;
 use App\Models\RoomType;
 use App\Models\User;
+use App\Policies\ReservationPolicy;
 use Carbon\Carbon;
 use Closure;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Form;
@@ -41,6 +49,7 @@ use Filament\Resources\Pages\Page;
 use Filament\Support\Enums\IconSize;
 use Filament\Support\RawJs;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\HtmlString;
 
 use function Filament\authorize;
 
@@ -131,34 +140,15 @@ class ReservationResource extends Resource
                         ->icon('tabler-user')
                         ->columns(3)
                         ->schema([
-                            \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('reservation_source')
-                                ->columnSpanFull()
-                                ->label(trans('frontOffice.reservation.reservationSourceLabel'))
-                                ->columns(2)
-                                ->descriptions(collect(ReservationSource::cases())->mapWithKeys(fn($description) => [
-                                    $description->value => $description->description(),
-                                ])->toArray())
-                                ->icons(collect(ReservationSource::cases())->mapWithKeys(fn($icon) => [
-                                    $icon->value => $icon->icon(),
-                                ])->toArray())
-                                ->options(collect(ReservationSource::cases())->mapWithKeys(fn($source) => [
-                                    $source->value => $source->label(),
-                                ])->toArray())
-                                ->color('primary'),
                             Forms\Components\Select::make('guest_id')
-                                ->columnSpan(2)
+                                ->allowHtml()
+                                ->columnSpanFull()
                                 ->relationship('guest', 'name')
                                 ->loadingMessage('Loading guests...')
                                 ->searchable(['name', 'email', 'identity_number', 'phone'])
                                 ->searchPrompt('Search guest by their name, identity number, email or phone.')
                                 ->native(false)
-                                ->getOptionLabelUsing(function ($value): ?string {
-                                    $user = User::find($value);
-                                    if ($user) {
-                                        return '<strong class="text-primary-500">' . $user->name . '</strong> /';
-                                    }
-                                    return null;
-                                })
+                                ->getOptionLabelFromRecordUsing(fn(Model $record) => "<span class='text-primary-500 font-bold'>{$record->name}</span> <br>Email : {$record->email}<br>Phone : {$record->phone}<br>Address : {$record->address}")
                                 ->editOptionForm([
                                     Forms\Components\Section::make('Guest Details')
                                         ->description('Please provide the necessary information to add a new reservation. Make sure to fill in all required fields.')
@@ -197,178 +187,157 @@ class ReservationResource extends Resource
                                             Forms\Components\TextInput::make('name')
 
                                                 ->label(trans('frontOffice.guest.nameLabel'))
+                                                ->prefixIcon('tabler-user')
+                                                ->prefixIconColor('primary')
                                                 ->required(),
                                             Forms\Components\TextInput::make('identity_number')
+                                                ->prefixIcon('tabler-id-badge-2')
+                                                ->prefixIconColor('primary')
                                                 ->required()
                                                 ->label(trans('frontOffice.guest.identityNumberLabel')),
                                             Forms\Components\TextInput::make('email')
+                                                ->prefixIcon('tabler-mail')
+                                                ->prefixIconColor('primary')
                                                 ->label(trans('frontOffice.guest.emailLabel'))
                                                 ->email(),
                                             Forms\Components\TextInput::make('phone')
+                                                ->prefixIcon('tabler-phone')
+                                                ->prefixIconColor('primary')
                                                 ->label(trans('frontOffice.guest.phoneLabel')),
+                                            Forms\Components\RichEditor::make('address')
+                                                ->columnSpanFull()
+                                                ->label(trans('frontOffice.guest.addressLabel')),
 
                                         ]),
 
                                 ])
                                 ->required(),
-
-                            Forms\Components\Placeholder::make('identity_number')
-                                ->visible(fn(Get $get): bool => $get('guest_id') !== null)
-                                ->content(fn(Get $get): string => Guest::find($get('guest_id'))->identity_number ?? '-')
-                                ->label(trans('frontOffice.guest.identityNumberLabel')),
-                            Forms\Components\Placeholder::make('email')
-                                ->visible(fn(Get $get): bool => $get('guest_id') !== null)
-                                ->content(fn(Get $get): string => Guest::find($get('guest_id'))->email ?? '-')
-                                ->label(trans('frontOffice.guest.emailLabel')),
-                            Forms\Components\Placeholder::make('phone')
-                                ->visible(fn(Get $get): bool => $get('guest_id') !== null)
-                                ->content(fn(Get $get): string => Guest::find($get('guest_id'))->phone ?? '-')
-                                ->label(trans('frontOffice.guest.phoneLabel')),
-                            Forms\Components\Placeholder::make('address')
-                                ->visible(fn(Get $get): bool => $get('guest_id') !== null)
-                                ->content(fn(Get $get): string => Guest::find($get('guest_id'))->address ?? '-')
-                                ->label(trans('frontOffice.guest.addressLabel')),
                         ]),
                 ]),
                 Forms\Components\Group::make([
-                    Forms\Components\Section::make('Reservation Schedule & Status')
-                        ->description('This section provides a detailed view of the reservation schedule and status.')
-                        ->icon('tabler-calendar-clock')
-                        ->columns(3)
+                    Forms\Components\Section::make('Reservation Details')
+                        ->hiddenOn(ManageReservations::class)
+                        ->description('Please provide the necessary information to add a new reservation. Make sure to fill in all required fields.')
+                        ->icon('tabler-file-text')
+                        ->columns(2)
                         ->schema([
-                            Forms\Components\DatePicker::make('check_in')
-                                ->live()
-                                ->default(now())
-                                ->native(false)
-                                ->prefixIcon('tabler-calendar')
-                                ->prefixIconColor('primary')
-                                // ->disabledDates(function (Get $get) {
-                                //     if ($get('room_id') === null) {
-                                //         return [];
-                                //     }
-
-                                //     return Room::find($get('room_id'))->getUnavailableDates($get('check_in'));
-                                // })
-                                // ->rules([
-                                //     fn(Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get) {
-                                //         $check = Reservation::whereBetween('check_in', [Carbon::parse($get('check_in'))->format('Y-m-d H:i:s'), Carbon::parse($get('check_out'))->format('Y-m-d H:i:s')])
-                                //             ->orWhereBetween('check_out', [Carbon::parse($get('check_in'))->format('Y-m-d H:i:s'), Carbon::parse($get('check_out'))->format('Y-m-d H:i:s')])
-                                //             ->orWhere(fn($q) => $q->where('check_in', '<', Carbon::parse($get('check_in'))->format('Y-m-d H:i:s'))->where('check_out', '>', Carbon::parse($get('check_out'))))
-                                //             ->exists();
-                                //         if ($check) {
-                                //             $fail("The date is not available or already booked.");
-                                //         }
-                                //     },
-                                // ])
-                                ->live(),
-                            Forms\Components\DatePicker::make('check_out')
-                                ->live()
-                                // ->disabledDates(function (Get $get) {
-                                //     if ($get('room_id') === null) {
-                                //         return [];
-                                //     }
-
-                                //     return Room::find($get('room_id'))->getUnavailableDates($get('check_in'));
-                                // })
-                                ->default(now()->addDays(1))
-                                ->native(false)
-                                ->prefixIcon('tabler-calendar')
-                                ->prefixIconColor('primary')
-                                ->afterOrEqual('check_in')
-                                // ->rules([
-                                //     fn(Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get) {
-                                //         $check = Reservation::whereBetween('check_in', [Carbon::parse($get('check_in'))->format('Y-m-d H:i:s'), Carbon::parse($get('check_out'))->format('Y-m-d H:i:s')])
-                                //             ->orWhereBetween('check_out', [Carbon::parse($get('check_in'))->format('Y-m-d H:i:s'), Carbon::parse($get('check_out'))->format('Y-m-d H:i:s')])
-                                //             ->orWhere(fn($q) => $q->where('check_in', '<', Carbon::parse($get('check_in'))->format('Y-m-d H:i:s'))->where('check_out', '>', Carbon::parse($get('check_out'))))
-                                //             ->exists();
-                                //         if ($check) {
-                                //             $fail("The date is not available or already booked.");
-                                //         }
-                                //     },
-                                // ])
-                                ->live()
-                                ->required(),
-                            Forms\Components\TimePicker::make('estimate_arrival')
-                                ->prefixIcon('tabler-clock')
-                                ->prefixIconColor('primary')
-                                ->label(trans('frontOffice.reservation.estimateArrivalLabel')),
-                            Forms\Components\Select::make('status')
-                                ->hiddenOn('create')
-                                ->label(trans('frontOffice.reservation.statusLabel'))
-                                ->options(collect(ReservationStatus::cases())->mapWithKeys(fn($status) => [
-                                    $status->value => $status->label(),
+                            \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('reservation_source')->required()
+                                ->columnSpanFull()
+                                ->label(trans('frontOffice.reservation.reservationSourceLabel'))
+                                ->columns(2)
+                                ->descriptions(collect(ReservationSource::cases())->mapWithKeys(fn($description) => [
+                                    $description->value => $description->description(),
                                 ])->toArray())
+                                ->icons(collect(ReservationSource::cases())->mapWithKeys(fn($icon) => [
+                                    $icon->value => $icon->icon(),
+                                ])->toArray())
+                                ->options(collect(ReservationSource::cases())->mapWithKeys(fn($source) => [
+                                    $source->value => $source->label(),
+                                ])->toArray())
+                                ->color('primary'),
+                            Forms\Components\Select::make('room_type')
+                                ->columnSpanFull()
+                                ->label(trans('frontOffice.reservation.roomTypeLabel'))
+                                ->options(collect(RoomType::all())->mapWithKeys(fn($roomType) => [
+                                    $roomType->id => '<strong>' . $roomType->name . '</strong><br>' . $roomType->description ?? '-',
+                                ])->toArray())
+                                ->searchable()
+                                ->native(false)
+                                ->required()
                                 ->allowHtml()
-                                ->native(false),
+                                ->live(),
+                            Forms\Components\Section::make('Select Room')
+
+                                ->visible(fn(Get $get): bool => $get('room_type') !== null)
+                                ->schema([
+                                    // Forms\Components\Placeholder::make('price')
+                                    //     ->label(trans('frontOffice.reservation.priceLabel'))
+                                    //     ->content(fn(Get $get): string =>  trans('frontOffice.reservation.priceCurrency') . ' ' . number_format(Room::find($get('room_id'))->price, 2) . '/night')
+                                    //     ->visible(fn(Get $get): bool => $get('room_id') !== null),
+                                    \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('room_id')
+                                        ->live()
+                                        ->hiddenLabel()
+                                        ->columns(4)
+                                        ->visible(fn(Get $get): bool => $get('room_type') !== null)
+                                        ->descriptions(function (Get $get) {
+                                            $rooms = Room::where('room_type_id', $get('room_type'))->where('is_available', true)->get();
+                                            return $rooms->mapWithKeys(function ($status) {
+                                                return [$status->id => trans('frontOffice.reservation.priceCurrency') . ' ' . number_format($status->price, 2) . '/night'];
+                                            })->toArray();
+                                        })
+                                        ->icons(function (Get $get) {
+                                            $rooms = Room::where('room_type_id', $get('room_type'))->where('is_available', true)->get();
+                                            return $rooms->mapWithKeys(function ($status) {
+                                                return [$status->id => 'tabler-door'];
+                                            })->toArray();
+                                        })
+                                        ->options(function (Get $get) {
+                                            $rooms = Room::availableBetween($get('check_in'), $get('check_out'), $get('room_type'))->get();
+                                            return $rooms->mapWithKeys(fn($status) => [
+                                                $status->id => $status->name . ' (Available)',
+                                            ])->toArray();
+                                        })
+                                        ->color('primary'),
+                                ]),
                         ]),
                 ]),
-                Forms\Components\Section::make('Reservation Details')
-                    ->hiddenOn(ManageReservations::class)
-                    ->aside()
-                    ->description('Please provide the necessary information to add a new reservation. Make sure to fill in all required fields.')
-                    ->icon('tabler-file-text')
-                    ->columns(2)
+                Forms\Components\Section::make('Reservation Schedule & Status')
+                    ->description('This section provides a detailed view of the reservation schedule and status.')
+                    ->icon('tabler-calendar-clock')
+                    ->columns(4)
                     ->schema([
-
-                        Forms\Components\Select::make('room_type')
-                            ->columnSpanFull()
-                            ->label(trans('frontOffice.reservation.roomTypeLabel'))
-                            ->options(collect(RoomType::all())->mapWithKeys(fn($roomType) => [
-                                $roomType->id => '<strong>' . $roomType->name . '</strong><br>' . $roomType->description ?? '-',
-                            ])->toArray())
-                            ->searchable()
+                        Forms\Components\DatePicker::make('check_in')
+                            ->live()
+                            ->default(now())
                             ->native(false)
+                            ->prefixIcon('tabler-calendar')
+                            ->prefixIconColor('primary')
+                            ->live(onBlur: true),
+                        Forms\Components\DatePicker::make('check_out')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                if ($get('room_id') !== null) {
+                                    $room = Room::find($get('room_id'));
+                                    $totalNights = number_format(Carbon::parse($get('check_in'))->diffInDays(Carbon::parse($get('check_out'))), 0);
+                                    $set('total_price', $room->price * $totalNights);
+                                }
+                            })
+                            ->default(now()->addDays(1))
+                            ->native(false)
+                            ->prefixIcon('tabler-calendar')
+                            ->prefixIconColor('primary')
+                            ->afterOrEqual('check_in')
+                            ->live()
+                            ->required(),
+                        \HusamTariq\FilamentTimePicker\Forms\Components\TimePickerField::make('estimate_arrival')
                             ->required()
+                            ->label(trans('frontOffice.reservation.estimateArrivalLabel')),
+                        Forms\Components\TextInput::make('total_price')
+                            ->prefix(trans('frontOffice.reservation.priceCurrency'))
+                            ->live()
+                            ->readOnly()
+                            ->label(trans('frontOffice.reservation.totalPriceLabel'))
+                            ->suffixAction(
+                                Forms\Components\Actions\Action::make('calculate')
+                                    ->label('Calculate')
+                                    ->color('primary')
+                                    ->icon('tabler-calculator')
+                                    ->action(function (Set $set, Get $get) {
+                                        if ($get('room_id') !== null) {
+                                            $room = Room::find($get('room_id'));
+                                            $totalNights = number_format(Carbon::parse($get('check_in'))->diffInDays(Carbon::parse($get('check_out'))), 0);
+                                            $set('total_price', $room->price * $totalNights);
+                                        }
+                                    }),
+                            ),
+                        Forms\Components\Select::make('status')
+                            ->hiddenOn('create')
+                            ->label(trans('frontOffice.reservation.statusLabel'))
+                            ->options(collect(ReservationStatus::cases())->mapWithKeys(fn($status) => [
+                                $status->value => $status->label(),
+                            ])->toArray())
                             ->allowHtml()
-                            ->live(),
-                        Forms\Components\Section::make('Select Room')
-
-                            ->visible(fn(Get $get): bool => $get('room_type') !== null)
-                            ->schema([
-                                // Forms\Components\Placeholder::make('price')
-                                //     ->label(trans('frontOffice.reservation.priceLabel'))
-                                //     ->content(fn(Get $get): string =>  trans('frontOffice.reservation.priceCurrency') . ' ' . number_format(Room::find($get('room_id'))->price, 2) . '/night')
-                                //     ->visible(fn(Get $get): bool => $get('room_id') !== null),
-                                \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('room_id')
-                                    ->live()
-                                    ->hiddenLabel()
-                                    ->columns(4)
-                                    ->visible(fn(Get $get): bool => $get('room_type') !== null)
-                                    ->descriptions(function (Get $get) {
-                                        $rooms = Room::where('room_type_id', $get('room_type'))->where('is_available', true)->get();
-                                        return $rooms->mapWithKeys(function ($status) {
-                                            return [$status->id => trans('frontOffice.reservation.priceCurrency') . ' ' . number_format($status->price, 2) . '/night'];
-                                        })->toArray();
-                                    })
-                                    ->icons(function (Get $get) {
-                                        $rooms = Room::where('room_type_id', $get('room_type'))->where('is_available', true)->get();
-                                        return $rooms->mapWithKeys(function ($status) {
-                                            return [$status->id => 'tabler-door'];
-                                        })->toArray();
-                                    })
-                                    ->options(function (Get $get) {
-                                        $rooms = Room::availableBetween($get('check_in'), $get('check_out'), $get('room_type'))->get();
-                                        //$rooms = Room::where('room_type_id', $get('room_type'))->where('is_available', true)->get();
-                                        return $rooms->mapWithKeys(fn($status) => [
-                                            $status->id => $status->name . ' (Available)',
-                                        ])->toArray();
-                                    })
-                                    ->color('primary'),
-                            ]),
-                        // Forms\Components\Select::make('room_id')
-                        //     ->visible(fn(Get $get): bool => $get('room_type') !== null)
-                        //     ->label(trans('frontOffice.reservation.roomNameLabel'))
-                        //     ->relationship('room', 'name', modifyQueryUsing: fn(Get $get, Builder $query): Builder => $query->where('room_type_id', $get('room_type'))->where('is_available', true))
-                        //     ->allowHtml()
-                        //     ->native(false)
-                        //     ->required()
-                        //     ->live(),
-
-
-
-
-
-
+                            ->native(false),
                     ]),
             ]);
     }
@@ -420,17 +389,16 @@ class ReservationResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('guest.name')
+                    ->copyable()
+                    ->copyMessage('Phone copied sucessfully')
+                    ->tooltip(fn(Model $record): string => 'Phone : ' . $record->guest->phone)
                     ->description(fn(Model $record): string => $record->guest->email ?? '-')
                     ->icon('tabler-user')
                     ->weight(FontWeight::SemiBold)
                     ->label(trans('frontOffice.reservation.guestNameLabel'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('guest.phone')
-                    ->icon('tabler-phone')
-                    ->label(trans('frontOffice.reservation.guestPhoneLabel'))
-                    ->searchable()
-                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('check_in')
                     ->date()
                     ->alignCenter()
@@ -452,12 +420,6 @@ class ReservationResource extends Resource
                     ->label(trans('frontOffice.reservation.estimateArrivalLabel'))
                     ->icon('tabler-clock')
                     ->sortable(),
-                // Tables\Columns\SelectColumn::make('status')
-                //     ->tooltip(fn(Model $record): string => ReservationStatus::from($record->status)->description())
-                //     ->options(collect(ReservationStatus::cases())->mapWithKeys(fn($status) => [
-                //         $status->value => $status->label(),
-                //     ])->toArray())
-                //     ->selectablePlaceholder(false),
                 Tables\Columns\TextColumn::make('status')
                     ->label(trans('frontOffice.reservation.statusLabel'))
                     ->formatStateUsing(fn(string $state): string => ReservationStatus::from($state)->label())
@@ -496,399 +458,199 @@ class ReservationResource extends Resource
                 Tables\Filters\SelectFilter::make('status'),
             ])
             ->actions([
-                Tables\Actions\Action::make('check_in')
-                    ->visible(fn(Reservation $record): bool => $record->status === ReservationStatus::PENDING->value && $record->guest_status === GuestStatus::PENDING->value)
-                    ->button()
-                    ->requiresConfirmation()
-                    ->modalHeading('Check In')
-                    ->modalDescription('Are you sure you want to check in this reservation?')
-                    ->modalSubmitActionLabel('Yes, check in it')
-                    ->modalIcon('tabler-door-enter')
-                    ->icon('tabler-door-enter')
-                    ->color('primary')
-                    ->authorize(fn(): bool => auth()->user()->can('update_reservation'))
-                    ->fillForm(fn(Reservation $record): array => [
-                        'has_payment' => $record->has_payment,
-                        'price' => $record->price,
-                        'total_price' => $record->total_price,
-                        'status' => ReservationStatus::from($record->status)->value,
-                    ])
-                    ->form([
-                        Forms\Components\Section::make('Check In Details')
-                            ->description('Please provide the necessary information to check in this reservation. Make sure to fill in all required fields.')
-                            ->icon('tabler-file-text')
-                            ->schema([
-                                Forms\Components\DateTimePicker::make('guest_check_in_at')
-                                    ->native(false)
-                                    ->default(Carbon::now())
-                                    ->format('Y-m-d H:i:s')
-                                    ->displayFormat('Y-m-d H:i:s')
-                                    ->minDate(fn(Reservation $record): string =>  $record->check_in)
-                                    ->maxDate(fn(Reservation $record): string =>  $record->check_out)
-                                    ->label(trans('frontOffice.reservation.checkInLabel'))
-                                    ->prefixIcon('tabler-calendar')
-                                    ->prefixIconColor('primary')
-                                    ->required(),
-                                Forms\Components\Section::make('Room Details')
-                                    ->columns(4)
-                                    ->schema([
-                                        Forms\Components\Placeholder::make('room')
-                                            ->label(trans('frontOffice.reservation.roomNameLabel'))
-                                            ->content(fn(Reservation $record): string =>  $record->room->name),
-                                        Forms\Components\Placeholder::make('room_type')
-                                            ->label(trans('frontOffice.reservation.roomTypeLabel'))
-                                            ->content(fn(Reservation $record): string =>  $record->room->roomType->name),
-                                        Forms\Components\Placeholder::make('room')
-                                            ->label(trans('frontOffice.reservation.totalNightsLabel'))
-                                            ->content(fn(Reservation $record): string =>  $record->total_nights),
-                                        Forms\Components\Placeholder::make('price')
-                                            ->label(trans('frontOffice.reservation.totalPriceLabel'))
-                                            ->content(fn(Reservation $record): string =>  trans('frontOffice.reservation.priceCurrency') . ' ' . number_format($record->total_price, 2)),
-                                        Forms\Components\Placeholder::make('price_pernight')
-                                            ->content(fn(Reservation $record): string =>  trans('frontOffice.reservation.priceCurrency') . ' ' . number_format($record->room->price, 2)),
-
-                                    ]),
-
-                            ])->columns(2),
-
-
-                        Forms\Components\Repeater::make('payments')
-                            ->collapsible()
-                            ->columnSpanFull()
-                            ->relationship('payments')
-                            ->columns(4)
-                            ->schema([
-                                Forms\Components\TextInput::make('amount')
-                                    ->mask(RawJs::make('$money($input)'))
-                                    ->stripCharacters(',')
-                                    ->maxValue(fn(Get $get): ?int => $get('../../total_price'))
-                                    ->required()
-                                    ->numeric()
-                                    ->prefix(trans('frontOffice.reservation.priceCurrency')),
-
-                                \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('status')
-                                    ->columnSpan(3)
-                                    ->columns(4)
-                                    ->options(collect(PaymentStatus::cases())->mapWithKeys(fn($status) => [
-                                        $status->value => $status->label(),
-                                    ])->toArray())
-
-                                    ->icons(collect(PaymentStatus::cases())->mapWithKeys(fn($status) => [
-                                        $status->value => $status->icon(),
-                                    ])->toArray())
-                                    ->iconSize(IconSize::Small)
-                                    ->color('primary')
-                                    ->required(),
-                                \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('method')
-                                    ->columnSpanFull()
-                                    ->options(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
-                                        $status->value => $status->label(),
-                                    ])->toArray())
-                                    ->descriptions(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
-                                        $status->value => $status->description(),
-                                    ])->toArray())
-                                    ->icons(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
-                                        $status->value => $status->icon(),
-                                    ])->toArray())
-                                    ->iconSize(IconSize::Large)
-                                    ->color('primary')
-                                    ->required(),
-                            ])->minItems(1)
-                            ->defaultItems(1)
-                            ->itemLabel(fn(array $state): ?string => $state['method'] . ' - ' . trans('frontOffice.reservation.priceCurrency') . ' ' . number_format($state['amount'], 2) . ' / ' . $state['status'])
-                    ])
-                    ->action(function (array $data, Reservation $record): void {
-
-                        $record->status = ReservationStatus::CONFIRMED->value;
-                        $record->has_payment = true;
-                        $record->checked_in_by = auth()->user()->id;
-                        $record->guest_status = GuestStatus::CHECKIN->value;
-                        if ($record->guest_check_in_at !== null) {
-                            $record->guest_check_in_at = now();
-                        }
-
-                        $record->save();
-                        if ($record->save()) {
-                            Notifications\Notification::make()
-                                ->title('Reservation Status Changed')
-                                ->success()
-                                ->color('primary')
-                                ->body('The status of the reservation has been changed.')
-                                ->send();
-                        }
-                    })->modalWidth(MaxWidth::FiveExtraLarge),
-                Tables\Actions\Action::make('check_out')
-                    ->visible(fn(Reservation $record): bool => $record->status === ReservationStatus::CONFIRMED->value && $record->guest_status === GuestStatus::CHECKIN->value)
-                    ->button()
-                    ->requiresConfirmation()
-                    ->modalHeading('Check Out')
-                    ->modalDescription('Are you sure you want to check out this reservation?')
-                    ->modalSubmitActionLabel('Yes, check out it')
-                    ->modalIcon('tabler-door-exit')
-                    ->icon('tabler-door-exit')
-                    ->color('danger')
-                    ->authorize(fn(): bool => auth()->user()->can('update_reservation'))
-                    ->form([
-                        Forms\Components\Section::make('Check Out Details')
-                            ->description('Please provide the necessary information to check in this reservation. Make sure to fill in all required fields.')
-                            ->icon('tabler-file-text')
-                            ->schema([
-                                Forms\Components\DateTimePicker::make('guest_check_out_at')
-                                    ->native(false)
-                                    ->default(Carbon::now())
-                                    ->format('Y-m-d H:i:s')
-                                    ->displayFormat('Y-m-d H:i:s')
-                                    ->minDate(fn(Reservation $record): string =>  $record->check_in)
-                                    ->maxDate(fn(Reservation $record): string =>  $record->check_out)
-                                    ->label(trans('frontOffice.reservation.checkOutLabel'))
-                                    ->prefixIcon('tabler-calendar')
-                                    ->prefixIconColor('primary')
-                                    ->required(),
-                                Forms\Components\Section::make('Room Details')
-                                    ->columns(4)
-                                    ->schema([
-                                        Forms\Components\Placeholder::make('room')
-                                            ->label(trans('frontOffice.reservation.roomNameLabel'))
-                                            ->content(fn(Reservation $record): string =>  $record->room->name),
-                                        Forms\Components\Placeholder::make('room_type')
-                                            ->label(trans('frontOffice.reservation.roomTypeLabel'))
-                                            ->content(fn(Reservation $record): string =>  $record->room->roomType->name),
-                                        Forms\Components\Placeholder::make('room')
-                                            ->label(trans('frontOffice.reservation.totalNightsLabel'))
-                                            ->content(fn(Reservation $record): string =>  $record->total_nights),
-                                        Forms\Components\Placeholder::make('price')
-                                            ->label(trans('frontOffice.reservation.totalPriceLabel'))
-                                            ->content(fn(Reservation $record): string =>  trans('frontOffice.reservation.priceCurrency') . ' ' . number_format($record->total_price, 2)),
-                                        Forms\Components\Placeholder::make('price_pernight')
-                                            ->content(fn(Reservation $record): string =>  trans('frontOffice.reservation.priceCurrency') . ' ' . number_format($record->room->price, 2)),
-
-                                    ]),
-
-                            ])->columns(2),
-                        Forms\Components\Repeater::make('payments')
-                            ->columnSpanFull()
-                            ->relationship('payments')
-                            ->columns(4)
-                            ->schema([
-                                Forms\Components\TextInput::make('amount')
-                                    ->mask(RawJs::make('$money($input)'))
-                                    ->stripCharacters(',')
-                                    ->maxValue(fn(Get $get): ?int => $get('../../total_price'))
-                                    ->required()
-                                    ->numeric()
-                                    ->prefix(trans('frontOffice.reservation.priceCurrency')),
-
-                                \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('status')
-                                    ->columnSpan(3)
-                                    ->columns(4)
-                                    ->options(collect(PaymentStatus::cases())->mapWithKeys(fn($status) => [
-                                        $status->value => $status->label(),
-                                    ])->toArray())
-
-                                    ->icons(collect(PaymentStatus::cases())->mapWithKeys(fn($status) => [
-                                        $status->value => $status->icon(),
-                                    ])->toArray())
-                                    ->iconSize(IconSize::Small)
-                                    ->color('primary')
-                                    ->required(),
-                                \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('method')
-                                    ->columnSpanFull()
-                                    ->options(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
-                                        $status->value => $status->label(),
-                                    ])->toArray())
-                                    ->descriptions(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
-                                        $status->value => $status->description(),
-                                    ])->toArray())
-                                    ->icons(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
-                                        $status->value => $status->icon(),
-                                    ])->toArray())
-                                    ->iconSize(IconSize::Large)
-                                    ->color('primary')
-                                    ->required(),
-                            ])->minItems(1)
-                            ->defaultItems(1)
-                    ])->action(function (array $data, Reservation $record): void {
-
-                        $record->status = ReservationStatus::CONFIRMED->value;
-                        $record->has_payment = true;
-                        $record->checked_in_by = auth()->user()->id;
-                        $record->guest_status = GuestStatus::CHECKIN->value;
-                        if ($record->guest_check_in_at !== null) {
-                            $record->guest_check_in_at = now();
-                        }
-
-                        $record->save();
-                        if ($record->save()) {
-                            Notifications\Notification::make()
-                                ->title('Reservation Status Changed')
-                                ->success()
-                                ->color('primary')
-                                ->body('The status of the reservation has been changed.')
-                                ->send();
-                        }
-                    })->modalWidth(MaxWidth::FiveExtraLarge),
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
-                        ->authorize(fn(): bool => auth()->user()->can('view_reservation')),
-                    Tables\Actions\EditAction::make()
+                    Tables\Actions\Action::make('cancel')
+                        ->requiresConfirmation()
+                        ->color('danger')
+                        ->icon('tabler-x')
+
+                        ->action(function (Reservation $record) {
+                            event(new CancelReservationEvent($record, auth()->user()));
+                        })
+                        ->authorize(fn(Reservation $record): bool => auth()->user()->can('cancelReservation', $record)),
+
+                    Tables\Actions\Action::make('extend')
+                        ->icon('tabler-calendar-plus')
                         ->color('primary')
-                        ->authorize(fn(): bool => auth()->user()->can('update_reservation')),
-
-                    // Tables\Actions\Action::make('change_status')
-                    //     ->requiresConfirmation()
-                    //     ->modalHeading('Change Status')
-                    //     ->modalDescription('Are you sure you want to change the status of this reservation?')
-                    //     ->modalSubmitActionLabel('Yes, change it')
-                    //     ->modalIcon('tabler-circle-dot')
-                    //     ->icon('tabler-circle-dot')
-                    //     ->color('primary')
-                    //     ->authorize(fn(): bool => auth()->user()->can('update_reservation'))
-                    //     ->fillForm(fn(Reservation $record): array => [
-                    //         'has_payment' => $record->has_payment,
-                    //         'price' => $record->price,
-                    //         'total_price' => $record->total_price,
-                    //         'status' => ReservationStatus::from($record->status)->value,
-                    //     ])
-                    //     ->form([
-                    //         Forms\Components\Section::make('Reservation Details')
-
-                    //             ->description('Please provide the necessary information to add a new reservation. Make sure to fill in all required fields.')
-                    //             ->icon('tabler-file-text')
-
-                    //             ->schema([
-                    //                 Forms\Components\Select::make('status')
-                    //                     ->options(collect(ReservationStatus::cases())->mapWithKeys(fn($status) => [
-                    //                         $status->value => $status->label(),
-                    //                     ])->toArray())
-                    //                     ->distinct()
-                    //                     ->required()
-                    //                     ->live(),
-                    //                 Forms\Components\Toggle::make('has_payment')
-                    //                     ->inline(false)
-                    //                     ->onIcon('tabler-check')
-                    //                     ->offIcon('tabler-x')
-                    //                     ->visible(fn(Get $get): bool => $get('status') === 'confirmed')
-                    //                     ->label(trans('frontOffice.reservation.hasPaymentLabel'))
-                    //                     ->default(false)
-                    //                     ->required()
-                    //                     ->live(),
-                    //                 Forms\Components\Section::make('Room Details')
-                    //                     ->visible(fn(Get $get): bool => $get('status') === 'confirmed' && $get('has_payment'))
-                    //                     ->columns(4)
-                    //                     ->schema([
-                    //                         Forms\Components\Placeholder::make('room')
-                    //                             ->label(trans('frontOffice.reservation.roomNameLabel'))
-                    //                             ->content(fn(Reservation $record): string =>  $record->room->name)
-                    //                             ->visible(fn(Get $get): bool => $get('status') === 'confirmed' && $get('has_payment')),
-                    //                         Forms\Components\Placeholder::make('room_type')
-                    //                             ->label(trans('frontOffice.reservation.roomTypeLabel'))
-                    //                             ->content(fn(Reservation $record): string =>  $record->room->roomType->name)
-                    //                             ->visible(fn(Get $get): bool => $get('status') === 'confirmed' && $get('has_payment')),
-                    //                         Forms\Components\Placeholder::make('room')
-                    //                             ->label(trans('frontOffice.reservation.totalNightsLabel'))
-                    //                             ->content(fn(Reservation $record): string =>  $record->total_nights)
-                    //                             ->visible(fn(Get $get): bool => $get('status') === 'confirmed' && $get('has_payment')),
-                    //                         Forms\Components\Placeholder::make('price')
-                    //                             ->label(trans('frontOffice.reservation.totalPriceLabel'))
-                    //                             ->content(fn(Reservation $record): string =>  trans('frontOffice.reservation.priceCurrency') . ' ' . number_format($record->total_price, 2))
-                    //                             ->visible(fn(Get $get): bool => $get('status') === 'confirmed' && $get('has_payment')),
-                    //                         Forms\Components\Placeholder::make('price_pernight')
-                    //                             ->content(fn(Reservation $record): string =>  trans('frontOffice.reservation.priceCurrency') . ' ' . number_format($record->room->price, 2))
-                    //                             ->visible(fn(Get $get): bool => $get('status') === 'confirmed' && $get('has_payment')),
-
-                    //                     ]),
-
-                    //             ])->columns(2),
+                        ->requiresConfirmation()
+                        ->form([
+                            Forms\Components\DatePicker::make('extend_date')
+                                ->prefixIcon('tabler-calendar')
+                                ->prefixIconColor('primary')
+                                ->default(fn(Reservation $record): string =>  $record->check_out)
+                                ->minDate(fn(Reservation $record): string =>  $record->check_out)
+                        ])
+                        ->action(function (array $data, Reservation $record) {
+                            $record->extend($data['extend_date']);
+                            $record->is_completed_payment = false;
+                            $record->save();
+                        })
+                        ->authorize(fn(Reservation $record): bool => auth()->user()->can('extendReservation', $record)),
+                    Tables\Actions\Action::make('check_in')
+                        ->visible(fn(Reservation $record): bool => $record->status === ReservationStatus::PENDING->value && $record->guest_status === GuestStatus::PENDING->value)
+                        ->requiresConfirmation()
+                        ->modalHeading('Check In')
+                        ->modalDescription('Are you sure you want to check in this reservation?')
+                        ->modalSubmitActionLabel('Yes, check in it')
+                        ->modalIcon('tabler-door-enter')
+                        ->icon('tabler-door-enter')
+                        ->color('primary')
+                        ->authorize(fn(): bool => auth()->user()->can('update_reservation'))
+                        ->fillForm(fn(Reservation $record): array => [
+                            'guest_check_in_at' => $record->check_in,
+                            'payments' => $record->payments,
+                            'total_price' => $record->total_price,
+                        ])
+                        ->form([
+                            Forms\Components\Section::make('Check In Details')
+                                ->description('Please provide the necessary information to check in this reservation. Make sure to fill in all required fields.')
+                                ->icon('tabler-file-text')
+                                ->schema([
+                                    Forms\Components\DateTimePicker::make('guest_check_in_at')
+                                        ->native(false)
+                                        ->default(fn(Reservation $record): string =>  $record->check_in)
+                                        ->minDate(fn(Reservation $record): string =>  $record->check_in)
+                                        ->maxDate(fn(Reservation $record): string =>  $record->check_out)
+                                        ->label(trans('frontOffice.reservation.checkInLabel'))
+                                        ->prefixIcon('tabler-calendar')
+                                        ->prefixIconColor('primary')
+                                        ->required(),
+                                    \App\Forms\Components\RoomDetail::make('room_detail'),
 
 
-                    //         Forms\Components\Repeater::make('payments')
+                                ]),
 
-                    //             ->visible(fn(Get $get): bool => $get('status') === 'confirmed' && $get('has_payment'))
-                    //             ->columnSpanFull()
-                    //             ->relationship('payments')
-                    //             ->columns(3)
-                    //             // ->deletable(fn(Get $get): bool => !$get('has_payment'))
-                    //             ->schema([
-                    //                 Forms\Components\TextInput::make('amount')
-                    //                     ->required()
-                    //                     ->numeric()
-                    //                     ->prefix(trans('frontOffice.reservation.priceCurrency')),
-                    //                 Forms\Components\Select::make('status')
-                    //                     ->options(collect(PaymentStatus::cases())->mapWithKeys(fn($status) => [
-                    //                         $status->value => $status->label(),
-                    //                     ])->toArray())
-                    //                     ->required(),
-                    //                 \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('method')
-                    //                     ->columnSpanFull()
-                    //                     ->options(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
-                    //                         $status->value => $status->label(),
-                    //                     ])->toArray())
-                    //                     ->descriptions(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
-                    //                         $status->value => $status->description(),
-                    //                     ])->toArray())
-                    //                     ->icons(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
-                    //                         $status->value => $status->icon(),
-                    //                     ])->toArray())
-                    //                     ->iconSize(IconSize::Large)
-                    //                     ->color('primary')
-                    //                     ->required(),
+                            \Awcodes\TableRepeater\Components\TableRepeater::make('payments')
+                                ->headers([
+                                    \Awcodes\TableRepeater\Header::make('amount')->align('center'),
+                                    \Awcodes\TableRepeater\Header::make('status')->align('center'),
+                                    \Awcodes\TableRepeater\Header::make('method')->align('center'),
+                                    \Awcodes\TableRepeater\Header::make('type')->align('center'),
+                                    \Awcodes\TableRepeater\Header::make('%')->align('center'),
+                                ])
+                                ->schema([
+                                    Forms\Components\TextInput::make('amount')
+                                        ->live()
+                                        ->maxValue(fn(Get $get): ?int => $get('../../total_price'))
+                                        ->required()
+                                        ->numeric()
+                                        ->prefix(trans('frontOffice.reservation.priceCurrency')),
+                                    Forms\Components\Select::make('status')
+                                        ->options(collect(PaymentStatus::cases())->mapWithKeys(fn($status) => [
+                                            $status->value => $status->label(),
+                                        ])->toArray())
+                                        ->required(),
+                                    Forms\Components\Select::make('method')
 
-                    //                 // Forms\Components\Select::make('method')
-                    //                 //     ->options(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
-                    //                 //         $status->value => $status->label(),
-                    //                 //     ])->toArray())
-                    //                 //     ->required(),
+                                        ->options(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
+                                            $status->value => $status->label(),
+                                        ])->toArray())
+                                        ->required(),
+                                    Forms\Components\Select::make('type')
 
-                    //             ])->minItems(1)
-                    //     ])
-                    //     ->action(function (array $data, Reservation $record): void {
-                    //         $record->status = $data['status'];
-                    //         $record->save();
-                    //         if ($record->save()) {
-                    //             Notifications\Notification::make()
-                    //                 ->title('Reservation Status Changed')
-                    //                 ->success()
-                    //                 ->color('primary')
-                    //                 ->body('The status of the reservation has been changed.')
-                    //                 ->send();
-                    //         }
-                    //     })->modalWidth(MaxWidth::FiveExtraLarge),
+                                        ->options(collect(PaymentType::cases())->mapWithKeys(fn($status) => [
+                                            $status->value => $status->label(),
+                                        ])->toArray())
+                                        ->required(),
+                                    Forms\Components\Placeholder::make('percentage')
+                                        ->hiddenLabel()
+                                        ->content(fn(Get $get): string => number_format(($get('amount') / $get('../../total_price'))  * 100, 2) . '%'),
+                                ])
+                                ->columnSpan('full'),
+
+                        ])
+                        ->action(function (array $data, Reservation $record): void {
+                            event(new GuestCheckinEvent($data, $record, auth()->user()));
+                        })->modalWidth(MaxWidth::FiveExtraLarge)
+                        ->authorize(fn(Reservation $record): bool => auth()->user()->can('checkInReservation', $record)),
+                    Tables\Actions\Action::make('check_out')
+                        ->visible(fn(Reservation $record): bool => $record->status === ReservationStatus::CONFIRMED->value && $record->guest_status === GuestStatus::CHECKIN->value)
+                        ->requiresConfirmation()
+                        ->modalHeading('Check Out')
+                        ->modalDescription('Are you sure you want to check out this reservation?')
+                        ->modalSubmitActionLabel('Yes, check out it')
+                        ->modalIcon('tabler-door-exit')
+                        ->icon('tabler-door-exit')
+                        ->color('danger')
+                        ->authorize(fn(): bool => auth()->user()->can('update_reservation'))
+                        ->fillForm(fn(Reservation $record): array => [
+                            'reservation_id' => $record->id,
+                            'guest_check_out_at' => $record->check_out,
+                            'payments' => $record->payments,
+                            'total_price' => $record->total_price,
+                        ])
+                        ->form([
+                            Forms\Components\Section::make('Check Out Details')
+                                ->description('Please provide the necessary information to check in this reservation. Make sure to fill in all required fields.')
+                                ->icon('tabler-file-text')
+                                ->schema([
+                                    Forms\Components\DateTimePicker::make('guest_check_out_at')
+                                        ->native(false)
+                                        ->default(Carbon::now())
+                                        ->format('Y-m-d H:i:s')
+                                        ->displayFormat('Y-m-d H:i:s')
+                                        ->minDate(fn(Reservation $record): string =>  $record->check_in)
+                                        ->maxDate(fn(Reservation $record): string =>  $record->check_out)
+                                        ->label(trans('frontOffice.reservation.checkOutLabel'))
+                                        ->prefixIcon('tabler-calendar')
+                                        ->prefixIconColor('primary')
+                                        ->required(),
+                                    \App\Forms\Components\RoomDetail::make('room_detail'),
+
+                                ]),
+                            \Awcodes\TableRepeater\Components\TableRepeater::make('payments')
+                                ->headers([
+                                    \Awcodes\TableRepeater\Header::make('amount')->align('center'),
+                                    \Awcodes\TableRepeater\Header::make('status')->align('center'),
+                                    \Awcodes\TableRepeater\Header::make('method')->align('center'),
+                                    \Awcodes\TableRepeater\Header::make('type')->align('center'),
+                                    \Awcodes\TableRepeater\Header::make('%')->align('center'),
+                                ])
+                                ->schema([
+                                    Forms\Components\TextInput::make('amount')
+                                        ->live(onBlur: true)
+                                        ->readOnly(fn(Get $get): bool => $get('status') === 'completed')
+                                        ->maxValue(fn(Get $get): ?int => $get('../../total_price'))
+                                        ->required()
+                                        ->numeric()
+                                        ->prefix(trans('frontOffice.reservation.priceCurrency')),
+
+                                    Forms\Components\Select::make('status')
+                                        ->disableOptionWhen(fn($state): bool => $state === 'completed')
+                                        ->live()
+                                        ->options(collect(PaymentStatus::cases())->mapWithKeys(fn($status) => [
+                                            $status->value => $status->label(),
+                                        ])->toArray())
+                                        ->required(),
+                                    Forms\Components\Select::make('method')
+                                        ->disableOptionWhen(fn(Get $get): bool => $get('status') === 'completed')
+                                        ->options(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
+                                            $status->value => $status->label(),
+                                        ])->toArray())
+                                        ->required(),
+                                    Forms\Components\Select::make('type')
+                                        ->disableOptionWhen(fn(Get $get): bool => $get('status') === 'completed')
+                                        ->options(collect(PaymentType::cases())->mapWithKeys(fn($status) => [
+                                            $status->value => $status->label(),
+                                        ])->toArray())
+                                        ->required(),
+                                    Forms\Components\Placeholder::make('percentage')
+                                        ->hiddenLabel()
+                                        ->content(fn(Get $get): string => number_format(($get('amount') / $get('../../total_price'))  * 100, 2) . '%'),
+                                ])
+                                ->columnSpan('full'),
+                        ])->action(function (array $data, Reservation $record): void {
+                            event(new GuestCheckoutEvent($data, $record, auth()->user()));
+                        })->modalWidth(MaxWidth::FiveExtraLarge)
+                        ->authorize(fn(Reservation $record): bool => auth()->user()->can('checkOutReservation', $record)),
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make()
+                        ->color('primary'),
                 ]),
 
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('update_reservation')
-                        ->requiresConfirmation()
-                        ->modalHeading('Change Status')
-                        ->modalDescription('Are you sure you want to change the status of this reservation?')
-                        ->modalSubmitActionLabel('Yes, change it')
-                        ->modalIcon('tabler-circle-dot')
-                        ->icon('tabler-circle-dot')
-                        ->color('warning')
-                        ->authorize(fn(): bool => auth()->user()->can('update_reservation'))
-                        ->form([
-                            Forms\Components\Select::make('status')
-                                ->options(collect(ReservationStatus::cases())->mapWithKeys(fn($status) => [
-                                    $status->value => $status->label(),
-                                ])->toArray())
-                                ->distinct()
-                                ->required()
-                                ->live(),
-
-                        ])
-                        ->action(function (array $data, Collection $record): void {
-                            foreach ($record as $reservation) {
-                                $reservation->status = $data['status'];
-                                $reservation->save();
-                            }
-                            Notifications\Notification::make()
-                                ->title('Reservation Status Changed')
-                                ->success()
-                                ->color('primary')
-                                ->body('The status of the reservation has been changed.')
-                                ->send();
-                        }),
                     Tables\Actions\DeleteBulkAction::make(),
                     Tables\Actions\ForceDeleteBulkAction::make(),
                     Tables\Actions\RestoreBulkAction::make(),
@@ -988,6 +750,7 @@ class ReservationResource extends Resource
                                 ->date()
                                 ->label(trans('frontOffice.reservation.checkOutLabel')),
                             Infolists\Components\TextEntry::make('estimate_arrival')
+
                                 ->weight(FontWeight::Bold)
                                 ->color('danger')
                                 ->icon('tabler-clock')

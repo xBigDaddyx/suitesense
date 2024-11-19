@@ -2,12 +2,18 @@
 
 namespace App\Filament\FrontOffice\Resources;
 
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
+use App\Events\PaidPaymentEvent;
 use App\Filament\FrontOffice\Resources\PaymentResource\Pages;
 use App\Filament\FrontOffice\Resources\PaymentResource\RelationManagers;
 use App\Models\Payment;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
@@ -103,6 +109,7 @@ class PaymentResource extends Resource
             ->schema([
                 Forms\Components\Select::make('reservation_id')
                     ->relationship('reservation', 'id')
+                    ->searchable('number')
                     ->required(),
                 Forms\Components\TextInput::make('method')
                     ->required()
@@ -110,15 +117,10 @@ class PaymentResource extends Resource
                 Forms\Components\TextInput::make('amount')
                     ->required()
                     ->numeric(),
-                Forms\Components\TextInput::make('status')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('deleted_by')
-                    ->numeric(),
-                Forms\Components\TextInput::make('created_by')
-                    ->numeric(),
-                Forms\Components\TextInput::make('updated_by')
-                    ->numeric(),
+                Forms\Components\Select::make('status')
+                    ->options(collect(PaymentStatus::cases())->mapWithKeys(fn($status) => [
+                        $status->value => $status->label(),
+                    ])->toArray()),
             ]);
     }
 
@@ -140,20 +142,50 @@ class PaymentResource extends Resource
                     ),
 
                 Tables\Columns\TextColumn::make('number')
+                    ->color('success')
+                    ->copyable()
+                    ->icon('tabler-file-certificate')
+                    ->badge()
+                    ->weight(FontWeight::Bold)
                     ->label(trans('frontOffice.payment.numberLabel')),
                 Tables\Columns\TextColumn::make('reservation.number')
+                    ->copyable()
+                    ->icon('tabler-file-certificate')
+                    ->badge()
+                    ->weight(FontWeight::Bold)
                     ->label(trans('frontOffice.payment.reservationNumberLabel')),
                 Tables\Columns\TextColumn::make('reservation.room.roomType.name')
                     ->label(trans('frontOffice.reservation.roomTypeLabel')),
-                Tables\Columns\TextColumn::make('reservation.total_price')
-                    ->label(trans('frontOffice.reservation.totalPriceLabel'))
-                    ->numeric(),
-                Tables\Columns\TextColumn::make('method')
+
+                Tables\Columns\TextColumn::make('type')
+                    ->label(trans('frontOffice.payment.typeLabel'))
+                    ->badge()
+                    ->color(fn(string $state): string => PaymentType::from($state)->color())
+                    ->icon(fn(string $state): string => PaymentType::from($state)->icon())
                     ->searchable(),
+                Tables\Columns\TextColumn::make('method')
+                    ->label(trans('frontOffice.payment.methodLabel'))
+                    ->badge()
+                    ->color(fn(string $state): string => PaymentMethod::from($state)->color())
+                    ->icon(fn(string $state): string => PaymentMethod::from($state)->icon())
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('reservation.total_price')
+                    ->weight(FontWeight::Bold)
+                    ->color('info')
+                    ->label(trans('frontOffice.reservation.totalPriceLabel'))
+                    ->formatStateUsing(fn(string $state): string => trans('frontOffice.room.pricePrefix') . ' ' . number_format($state, 2)),
                 Tables\Columns\TextColumn::make('amount')
-                    ->numeric()
+                    ->color('danger')
+                    ->label(trans('frontOffice.payment.amountLabel'))
+                    ->formatStateUsing(fn(string $state): string => trans('frontOffice.room.pricePrefix') . ' ' . number_format($state, 2))
+                    ->weight(FontWeight::Bold)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
+                    ->label(trans('frontOffice.payment.statusLabel'))
+                    ->badge()
+                    ->badge()
+                    ->color(fn(string $state): string => PaymentStatus::from($state)->color())
+                    ->icon(fn(string $state): string => PaymentStatus::from($state)->icon())
                     ->searchable(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
@@ -184,7 +216,18 @@ class PaymentResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->button()
+                    ->authorize(fn(): bool => auth()->user()->can('update_payment')),
+                Tables\Actions\Action::make('paid')
+                    ->visible(fn(Model $record): bool => $record->status === PaymentStatus::PENDING->value)
+                    ->button()
+                    ->color('success')
+                    ->icon('tabler-check')
+                    ->requiresConfirmation()
+                    ->action(function (Model $record) {
+                        event(new PaidPaymentEvent($record, auth()->user()));
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

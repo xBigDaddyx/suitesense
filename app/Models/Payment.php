@@ -33,6 +33,7 @@ class Payment extends Model
         'number',
         'number_series',
         'number_payment',
+        'type'
     ];
     public function scopePending(Builder $query): Builder
     {

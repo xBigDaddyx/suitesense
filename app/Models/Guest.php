@@ -13,6 +13,7 @@ class Guest extends Model
     use Userstamps;
     use HasUuids;
     protected $fillable = [
+        'address',
         'name',
         'email',
         'phone',
