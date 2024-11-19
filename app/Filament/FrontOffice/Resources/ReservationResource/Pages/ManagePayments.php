@@ -73,7 +73,6 @@ class ManagePayments extends ManageRelatedRecords
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->icon('tabler-plus')
-                    ->authorize(fn(): bool => auth()->user()->can('create', Payment::class) && ),
             ]);
         // return $table
         //     ->recordTitleAttribute('amount')
