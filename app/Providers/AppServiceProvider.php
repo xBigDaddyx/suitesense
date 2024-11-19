@@ -15,6 +15,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 
 class AppServiceProvider extends ServiceProvider
@@ -32,6 +33,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (env('APP_ENV') == 'production') {
+            URL::forceScheme('https');
+        }
+
         Event::listen(CancelReservationEvent::class, CancelReservationListener::class);
         Payment::observe(PaymentObserver::class);
         Reservation::observe(ReservationObserver::class);
