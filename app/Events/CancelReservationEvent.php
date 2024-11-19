@@ -17,13 +17,15 @@ class CancelReservationEvent
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public Reservation $record;
     public User $user;
+    public array $data;
     /**
      * Create a new event instance.
      */
-    public function __construct(Reservation $record, User $user)
+    public function __construct(Reservation $record, array $data, User $user)
     {
         $this->record = $record;
         $this->user = $user;
+        $this->data = $data;
     }
 
     /**

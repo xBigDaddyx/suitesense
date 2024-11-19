@@ -4,6 +4,7 @@ namespace App\Filament\FrontOffice\Resources\ReservationResource\Pages;
 
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Enums\PaymentType;
 use App\Filament\FrontOffice\Resources\PaymentResource;
 use App\Filament\FrontOffice\Resources\ReservationResource;
 use App\Models\Payment;
@@ -35,6 +36,7 @@ class ManagePayments extends ManageRelatedRecords
     public function form(Form $form): Form
     {
         return $form->schema([
+
             Forms\Components\TextInput::make('amount')
                 ->live(onBlur: true)
                 ->readOnly(fn(Get $get): bool => $get('status') === 'completed')
@@ -44,6 +46,7 @@ class ManagePayments extends ManageRelatedRecords
                 ->prefix(trans('frontOffice.reservation.priceCurrency')),
 
             Forms\Components\Select::make('status')
+                ->hiddenOn('create')
                 ->disableOptionWhen(fn($state): bool => $state === 'completed')
                 ->live()
                 ->options(collect(PaymentStatus::cases())->mapWithKeys(fn($status) => [
@@ -56,9 +59,11 @@ class ManagePayments extends ManageRelatedRecords
                     $status->value => $status->label(),
                 ])->toArray())
                 ->required(),
-            // Forms\Components\Placeholder::make('percentage')
-            //     ->hiddenLabel()
-            //     ->content(fn(Get $get, $record): string => number_format(($get('amount') / $record->total_price)  * 100, 2) . '%'),
+            Forms\Components\Select::make('type')
+                ->options(collect(PaymentType::cases())->mapWithKeys(fn($status) => [
+                    $status->value => $status->label(),
+                ])->toArray())
+                ->required(),
         ]);
     }
 
@@ -68,6 +73,7 @@ class ManagePayments extends ManageRelatedRecords
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->icon('tabler-plus')
+                    ->authorize(fn(): bool => auth()->user()->can('create', Payment::class) && ),
             ]);
         // return $table
         //     ->recordTitleAttribute('amount')

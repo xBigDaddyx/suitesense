@@ -218,16 +218,16 @@ class PaymentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->button()
-                    ->authorize(fn(): bool => auth()->user()->can('update_payment')),
+                    ->authorize(fn(Model $record): bool => auth()->user()->can('update', $record)),
                 Tables\Actions\Action::make('paid')
-                    ->visible(fn(Model $record): bool => $record->status === PaymentStatus::PENDING->value)
                     ->button()
                     ->color('success')
                     ->icon('tabler-check')
                     ->requiresConfirmation()
                     ->action(function (Model $record) {
                         event(new PaidPaymentEvent($record, auth()->user()));
-                    }),
+                    })
+                    ->authorize(fn(Model $record): bool => auth()->user()->can('paidPayment', $record)),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

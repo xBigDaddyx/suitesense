@@ -39,7 +39,7 @@ class ReservationPolicy
      */
     public function update(User $user, Reservation $reservation): bool
     {
-        if ($reservation->status == ReservationStatus::COMPLETED->value) {
+        if ($reservation->status == ReservationStatus::COMPLETED->value || $reservation->status == ReservationStatus::CANCELLED->value) {
             return false;
         }
         return $user->can('update_reservation');
@@ -90,7 +90,7 @@ class ReservationPolicy
     /** Determine whether the user can cancel the reservation */
     public function cancelReservation(User $user, Reservation $reservation): bool
     {
-        if ($reservation->status == ReservationStatus::COMPLETED->value && $reservation->guest_status != GuestStatus::CHECKIN->value) {
+        if ($reservation->status == ReservationStatus::COMPLETED->value && $reservation->guest_status != GuestStatus::CHECKIN->value || $reservation->status == ReservationStatus::CANCELLED->value) {
             return false;
         }
         return $user->can('cancel_reservation');
@@ -99,7 +99,7 @@ class ReservationPolicy
     /** Determine whether the user can extend the reservation */
     public function extendReservation(User $user, Reservation $reservation): bool
     {
-        if ($reservation->status == ReservationStatus::COMPLETED->value && $reservation->guest_status != GuestStatus::CHECKIN->value) {
+        if ($reservation->status == ReservationStatus::COMPLETED->value && $reservation->guest_status != GuestStatus::CHECKIN->value || $reservation->status == ReservationStatus::CANCELLED->value) {
             return false;
         }
         return $user->can('extend_reservation');

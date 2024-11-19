@@ -35,6 +35,10 @@ class Reservation extends Model
         });
     }
     protected $fillable = [
+        'reason',
+        'cancelled_by',
+        'cancelled_at',
+        'cancelled_reason',
         'total_price',
         'guest_check_in_at',
         'guest_check_out_at',

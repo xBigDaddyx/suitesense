@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('reservations', function (Blueprint $table) {
             $table->unsignedBigInteger('cancelled_by')->nullable();
             $table->timestamp('cancelled_at')->nullable();
+            $table->text('cancelled_reason')->nullable();
         });
     }
 
@@ -25,6 +26,7 @@ return new class extends Migration
         Schema::table('reservations', function (Blueprint $table) {
             $table->dropColumn('cancelled_by');
             $table->dropColumn('cancelled_at');
+            $table->dropColumn('cancelled_reason');
         });
     }
 };

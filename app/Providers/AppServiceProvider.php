@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\CancelReservationEvent;
+use App\Listeners\CancelReservationListener;
 use App\Models\Payment;
 use App\Models\Reservation;
 use App\Observers\PaymentObserver;
@@ -12,6 +14,7 @@ use Illuminate\Support\ServiceProvider;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Facades\FilamentColor;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 
 class AppServiceProvider extends ServiceProvider
@@ -29,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Event::listen(CancelReservationEvent::class, CancelReservationListener::class);
         Payment::observe(PaymentObserver::class);
         Reservation::observe(ReservationObserver::class);
         Page::$reportValidationErrorUsing = function (ValidationException $exception) {

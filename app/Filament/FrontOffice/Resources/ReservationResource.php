@@ -460,12 +460,37 @@ class ReservationResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\Action::make('cancel')
+                        ->modalHeading('Cancel Reservation')
+                        ->modalDescription('Are you sure you want to cancel this reservation?')
+                        ->modalSubmitActionLabel('Yes, cancel it')
+                        ->modalIcon('tabler-exclamation')
+                        ->color('danger')
                         ->requiresConfirmation()
                         ->color('danger')
                         ->icon('tabler-x')
+                        ->form([
+                            Forms\Components\Section::make('Cancel Reservation')
+                                ->description('Please provide the necessary information to cancel this reservation. Make sure to fill in all required fields.')
+                                ->icon('tabler-file-text')
+                                ->schema([
+                                    Forms\Components\Toggle::make('is_refund')
+                                        ->inline()
+                                        ->label(trans('frontOffice.reservation.refundLabel'))
+                                        ->default(false)
+                                        ->onIcon('tabler-check')
+                                        ->offIcon('tabler-x')
+                                        ->onColor('primary')
+                                        ->offColor('danger'),
+                                    Forms\Components\Textarea::make('reason')
+                                        ->label(trans('frontOffice.reservation.reasonLabel'))
+                                        ->required(),
+                                ]),
 
-                        ->action(function (Reservation $record) {
-                            event(new CancelReservationEvent($record, auth()->user()));
+
+
+                        ])
+                        ->action(function (array $data, Reservation $record) {
+                            event(new CancelReservationEvent($record, $data, auth()->user()));
                         })
                         ->authorize(fn(Reservation $record): bool => auth()->user()->can('cancelReservation', $record)),
 

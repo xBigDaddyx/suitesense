@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -35,6 +36,11 @@ class Payment extends Model
         'number_payment',
         'type'
     ];
+    public function refund()
+    {
+        $this->status = PaymentStatus::REFUNDED->value;
+        $this->save();
+    }
     public function scopePending(Builder $query): Builder
     {
         return $query->where('status', 'pending');

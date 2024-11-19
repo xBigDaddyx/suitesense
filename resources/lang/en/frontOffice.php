@@ -75,6 +75,8 @@ return [
         'priceLabel' => 'Price',
         'pricePerNightLabel' => 'Price Per Night',
         'reservationSourceLabel' => 'Reservation Source',
+        'refundLabel' => 'Refund',
+        'reasonLabel' => 'Reason',
 
     ],
     'payment' => [
