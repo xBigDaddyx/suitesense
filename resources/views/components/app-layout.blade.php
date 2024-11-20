@@ -5,17 +5,47 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Laravel</title>
+    <meta name="description"
+        content="Suitify adalah aplikasi inovatif untuk manajemen hotel, dirancang untuk mempermudah pengelolaan operasional hotel Anda.">
+    <meta name="keywords"
+        content="manajemen hotel, sistem perhotelan, hotel management system, aplikasi hotel, property management system, PMS, Suitify">
+    <meta name="author" content="Suitify">
+    <meta name="robots" content="index, follow">
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Suitify - Sistem Manajemen Perhotelan Terintegrasi">
+    <meta property="og:description"
+        content="Kelola hotel Anda dengan mudah dan efisien menggunakan Suitify, solusi lengkap untuk manajemen hotel.">
+    <meta property="og:image" content="https://example.com/images/suitify-logo.png">
+    <meta property="og:url" content="https://suitify.com">
+    <meta property="og:type" content="website">
 
-    <!-- Styles / Scripts -->
-    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @else
-    @endif
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Suitify - Sistem Manajemen Perhotelan Terintegrasi">
+    <meta name="twitter:description"
+        content="Kelola hotel Anda dengan mudah dan efisien menggunakan Suitify, solusi lengkap untuk manajemen hotel.">
+    <meta name="twitter:image" content="https://example.com/images/suitify-logo.png">
+
+    <title>Suitify - Sistem Manajemen Perhotelan Terintegrasi</title>
+
+    <!-- favicon icon -->
+    <link rel="shortcut icon" href="images/favicon.png">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+    <!-- google fonts preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="stylesheet" href="css/layout/vendors.min.css" />
+    <link rel="stylesheet" href="css/layout/icon.min.css" />
+    <link rel="stylesheet" href="css/layout/style.css" />
+    <link rel="stylesheet" href="css/layout/responsive.css" />
+    <link rel="stylesheet" href="css/layout/suitify.css" />
+
+
+    {{-- @vite(['resources/js/app.js']) --}}
     <script>
         const html = document.querySelector('html');
         const isLightOrAuto = localStorage.getItem('hs_theme') === 'light' || (localStorage.getItem('hs_theme') ===
@@ -30,11 +60,14 @@
     </script>
 </head>
 
-<body class="font-sans antialiased dark:bg-black dark:text-white/50">
-    <script src="./node_modules/preline/dist/preline.js"></script>
+<body data-mobile-nav-trigger-alignment="right" data-mobile-nav-style="modern" data-mobile-nav-bg-color="#1d1d1d">
     <x-navbar-layout />
     {{ $slot }}
 
+    <!-- javascript libraries -->
+    <script type="text/javascript" src="js/layout/jquery.js"></script>
+    <script type="text/javascript" src="js/layout/vendors.min.js"></script>
+    <script type="text/javascript" src="js/layout/main.js"></script>
 </body>
 
 </html>

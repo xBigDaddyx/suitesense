@@ -80,7 +80,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     }
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        return $this->hasVerifiedEmail();
     }
     public function getDefaultTenant(Panel $panel): ?Model
     {

@@ -80,7 +80,7 @@ class PaymentPolicy
     /** Determine whether the user can paid the payment */
     public function paidPayment(User $user, Payment $payment): bool
     {
-        if ($payment->status == PaymentStatus::COMPLETED->value && $payment->reservation->status == ReservationStatus::CANCELLED->value || $payment->status == PaymentStatus::REFUNDED->value) {
+        if ($payment->status == PaymentStatus::COMPLETED->value && $payment->reservation->status == ReservationStatus::CANCELLED->value || $payment->status == PaymentStatus::REFUNDED->value || $payment->status == PaymentStatus::COMPLETED->value) {
             return false;
         }
         return $user->can('paid_payment');
