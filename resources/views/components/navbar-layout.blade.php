@@ -8,11 +8,11 @@
                      <img src="{{ asset('images/logo/suite_sense_logo_white.png') }}"
                          data-at2x="{{ asset('images/logo/suite_sense_logo_white.png') }}" alt=""
                          class="default-logo">
-                     <img src="{{ asset('images/logo/suite_sense_logo_dark.png') }}"
-                         data-at2x="{{ asset('images/logo/suite_sense_logo_dark.png') }}" alt=""
+                     <img src="{{ asset('images/logo/suite_sense_logo_white.png') }}"
+                         data-at2x="{{ asset('images/logo/suite_sense_logo_white.png') }}" alt=""
                          class="alt-logo">
-                     <img src="{{ asset('images/logo/suite_sense_logo_dark.png') }}"
-                         data-at2x="{{ asset('images/logo/suite_sense_logo_dark.png') }}" alt=""
+                     <img src="{{ asset('images/logo/suite_sense_logo_white.png') }}"
+                         data-at2x="{{ asset('images/logo/suite_sense_logo_white.png') }}" alt=""
                          class="mobile-logo">
                  </a>
              </div>
