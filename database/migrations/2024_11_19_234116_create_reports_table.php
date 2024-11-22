@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->enum('period', ['daily', 'weekly', 'monthly'])->default('daily');
             $table->text('description')->nullable();
+            $table->string('route');
             $table->timestamps();
         });
     }

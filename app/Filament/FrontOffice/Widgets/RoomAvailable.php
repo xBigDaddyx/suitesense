@@ -2,6 +2,7 @@
 
 namespace App\Filament\FrontOffice\Widgets;
 
+use App\Enums\RoomStatus;
 use App\Models\Room;
 use Filament\Widgets\Widget;
 
@@ -12,7 +13,7 @@ class RoomAvailable extends Widget
 
     public function getRooms()
     {
-        return $this->availableRooms = Room::available()  // Only available room
+        return $this->availableRooms = Room::where('status', RoomStatus::AVAILABLE->value)  // Only available room
             ->orderBy('room_type_id')  // Sort by room_type_id
             ->get();
     }

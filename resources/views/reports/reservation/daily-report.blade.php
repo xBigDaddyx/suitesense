@@ -2,7 +2,7 @@
     <div class="w-full mx-auto p-6">
         <!-- Header Section -->
         <div class="flex items-center justify-between mb-6">
-            <img src="{{ asset('storage/images/logo/suite_sense_logo_white.png') }}" alt="Company Logo" class="h-10">
+            <img src="{{ asset('images/logo/suite_sense_logo_white.png') }}" alt="Company Logo" class="h-10">
             <h1 class="text-2xl font-bold">Reservation Daily Report</h1>
             <div>
                 <p class="text-2xl font-bold text-primary-500">{{ auth()->user()->latestHotel->name }}</p>

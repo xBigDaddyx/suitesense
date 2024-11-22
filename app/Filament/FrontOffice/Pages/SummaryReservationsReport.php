@@ -29,11 +29,12 @@ class SummaryReservationsReport extends Page implements HasTable, HasForms
 
     public string $endDate;
     public string $startDate;
+    public $datas;
 
     protected static ?string $navigationIcon = 'tabler-file-invoice';
     protected static ?string $navigationLabel = 'Summary Reservations Report';
     protected static ?string $navigationGroup = 'Reports';
-    protected static string $view = 'filament.front-office.pages.summary-reservations-report';
+
 
     public function getTableRecordKey(Model $record): string
     {
@@ -47,6 +48,26 @@ class SummaryReservationsReport extends Page implements HasTable, HasForms
         //     'Content-Type' => 'application/pdf',
         //     'Content-Disposition' =>  'attachment; filename="ticket.pdf"'
         // ));
+    }
+    public function mount()
+    {
+        $this->getDatas('2024-01-01', '2024-12-31');
+    }
+    public function getDatas($startDate, $endDate)
+    {
+        return $this->datas =  Reservation::join('rooms', 'reservations.room_id', '=', 'rooms.id')
+            ->join('room_types', 'rooms.room_type_id', '=', 'room_types.id')
+            ->select(
+                'room_types.id as room_type_id', // Unique ID untuk tiap tipe kamar
+                'room_types.name as room_type',
+                'rooms.price as room_price',
+                DB::raw('COUNT(reservations.id) as total_reservations'),
+                DB::raw("SUM(DATE_PART('day', reservations.check_out - reservations.check_in)) as nights"),
+                DB::raw('SUM(reservations.total_price) as total_revenue')
+            )
+            ->whereBetween('reservations.check_in', [$startDate, $endDate]) // Filter tanggal check-in
+            ->groupBy('room_types.id', 'room_types.name', 'rooms.price')
+            ->orderByDesc('total_revenue');
     }
     public function table(Table $table): Table
     {
@@ -146,4 +167,5 @@ class SummaryReservationsReport extends Page implements HasTable, HasForms
                 // ...
             ]);
     }
+    protected static string $view = 'filament.front-office.pages.summary-reservations-report';
 }

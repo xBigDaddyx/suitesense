@@ -1,7 +1,8 @@
 <!-- resources/views/components/room-card.blade.php -->
-<x-filament::section icon="tabler-door" icon-color="primary">
+<x-filament::section>
     <x-slot name="heading">
-        {{ $room->name }}
+        <span class="text-3xl font-bold text-primary-500 dark:text-white">{{ $room->name }}</span>
+
     </x-slot>
     <x-slot name="headerEnd">
         <x-filament::button icon="tabler-calendar" tag="a"

@@ -52,17 +52,6 @@ class Room extends Model implements HasMedia
             ->fit(Fit::Contain, 600, 600)
             ->nonQueued();
     }
-    public function scopeAvailableBetween(Builder $query, string $checkInDate, string $checkOutDate, string $roomTypeId): Builder
-    {
-        return $query->where('is_available', true)
-            ->when($roomTypeId, fn($q) => $q->where('room_type_id', $roomTypeId))
-            ->whereDoesntHave('reservations', function ($query) use ($checkInDate, $checkOutDate) {
-                $query->where(function ($q) use ($checkInDate, $checkOutDate) {
-                    $q->where('check_in', '<', $checkOutDate)
-                        ->where('check_out', '>', $checkInDate);
-                });
-            });
-    }
     public function getAvailableDates(string $startDate, string $endDate): array
     {
         $availableDates = [];

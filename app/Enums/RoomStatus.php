@@ -8,6 +8,7 @@ enum RoomStatus: string
     case BOOKED = 'booked';          // Kamar sudah dipesan
     case OCCUPIED = 'occupied';      // Kamar sedang dihuni
     case MAINTENANCE = 'maintenance'; // Kamar dalam perawatan
+    case CLEANING = 'cleaning'; // Kamar dalam perawatan
 
     /**
      * Get a human-readable description for the enum value.
@@ -19,6 +20,7 @@ enum RoomStatus: string
             self::BOOKED => 'Kamar telah dipesan oleh tamu.',
             self::OCCUPIED => 'Kamar sedang dihuni oleh tamu.',
             self::MAINTENANCE => 'Kamar sedang dalam perawatan.',
+            self::CLEANING => 'Kamar sedang dalam pembersihan.',
         };
     }
 
@@ -32,6 +34,7 @@ enum RoomStatus: string
             self::BOOKED => 'Dipesan',
             self::OCCUPIED => 'Dihuni',
             self::MAINTENANCE => 'Perawatan',
+            self::CLEANING => 'Pembersihan',
         };
     }
 }

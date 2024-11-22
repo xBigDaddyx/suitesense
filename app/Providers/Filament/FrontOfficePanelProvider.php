@@ -36,27 +36,28 @@ class FrontOfficePanelProvider extends PanelProvider
             ->maxContentWidth(MaxWidth::Full)
             ->font('Poppins')
             ->sidebarCollapsibleOnDesktop()
-            ->darkModeBrandLogo('/storage/images/logo/suite_sense_logo_dark.png')
-            ->brandLogo(asset('/storage/images/logo/suite_sense_logo_white.png'))
+            ->darkModeBrandLogo(asset('images/logo/suite_sense_logo_dark.png'))
+            ->brandLogo(asset('images/logo/suite_sense_logo_white.png'))
             ->brandLogoHeight('2rem')
-            ->favicon(asset('/storage/images/logo/suite_sense_logo_icon.png'))
+            ->favicon(asset('images/logo/suite_sense_logo_icon.png'))
             ->plugins([
                 \Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin::make(),
                 \Saade\FilamentFullCalendar\FilamentFullCalendarPlugin::make(),
             ])
             ->colors([
                 'primary' => [
-                    '50' => '#fffcea',
-                    '100' => '#fff7c6',
-                    '200' => '#ffee87',
-                    '300' => '#ffdd49',
-                    '400' => '#ffcb1f',
-                    '500' => '#fbac08',
-                    '600' => '#de8101',
-                    '700' => '#b85a05',
-                    '800' => '#95450b',
-                    '900' => '#7b390c',
-                    '950' => '#471c01',
+                    '50' => '#f7f6fc',
+                    '100' => '#efedfa',
+                    '200' => '#e1def6',
+                    '300' => '#cbc4ee',
+                    '400' => '#b0a2e3',
+                    '500' => '#947cd6',
+                    '600' => '#7e5bc6',
+                    '700' => '#714db4',
+                    '800' => '#5e4097',
+                    '900' => '#4e367c',
+                    '950' => '#312253',
+
                 ],
             ])
             ->discoverResources(in: app_path('Filament/FrontOffice/Resources'), for: 'App\\Filament\\FrontOffice\\Resources')

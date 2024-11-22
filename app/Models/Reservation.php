@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Wildside\Userstamps\Userstamps;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Ramsey\Uuid\Type\Decimal;
 
 class Reservation extends Model
@@ -19,6 +20,7 @@ class Reservation extends Model
     use HasUuids;
     use SoftDeletes;
     use Userstamps;
+    use HasFactory;
     protected static function booted(): void
     {
         parent::booted();

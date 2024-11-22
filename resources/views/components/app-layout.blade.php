@@ -16,7 +16,7 @@
     <meta property="og:title" content="Suitify - Sistem Manajemen Perhotelan Terintegrasi">
     <meta property="og:description"
         content="Kelola hotel Anda dengan mudah dan efisien menggunakan Suitify, solusi lengkap untuk manajemen hotel.">
-    <meta property="og:image" content="https://example.com/images/suitify-logo.png">
+    <meta property="og:image" content={{ asset('images/logo/suite_sense_logo_icon.png') }}">
     <meta property="og:url" content="https://suitify.com">
     <meta property="og:type" content="website">
 
@@ -25,12 +25,12 @@
     <meta name="twitter:title" content="Suitify - Sistem Manajemen Perhotelan Terintegrasi">
     <meta name="twitter:description"
         content="Kelola hotel Anda dengan mudah dan efisien menggunakan Suitify, solusi lengkap untuk manajemen hotel.">
-    <meta name="twitter:image" content="https://example.com/images/suitify-logo.png">
+    <meta name="twitter:image" content="{{ asset('images/logo/suite_sense_logo_icon.png') }}">
 
     <title>Suitify - Sistem Manajemen Perhotelan Terintegrasi</title>
 
     <!-- favicon icon -->
-    <link rel="shortcut icon" href="images/favicon.png">
+    <link rel="shortcut icon" href="{{ asset('images/logo/suite_sense_logo_icon.png') }}">
     <link rel="apple-touch-icon" href="images/apple-touch-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
     <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">

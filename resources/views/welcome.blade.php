@@ -21,7 +21,7 @@
                         <p class="w-75 mb-35px lg-w-90 sm-w-100">Tingkatkan efisiensi operasional hotel Anda dengan
                             teknologi modern dan kemudahan penggunaan. Kelola reservasi, kamar, dan layanan tamu dalam
                             satu platform cerdas.</p>
-                        <a href="#" class="btn btn-extra-large btn-gradient-fuel-yellow-blue fw-400">Let's talk -
+                        <a href="#" class="btn btn-extra-large btn-base-color fw-400">Let's talk -
                             Send a message</a>
                     </div>
                 </div>
@@ -34,21 +34,21 @@
                             <!-- start slider item -->
                             <div class="swiper-slide">
                                 <div class="position-absolute left-0px top-0px w-100 h-100 cover-background background-position-center-top"
-                                    style="background-image:url('{{ asset('images/illustration/suitify_illustration_photo_01.jpg') }}');">
+                                    style="background-image:url('{{ asset('images/illustration/suitify_illustration_photo_02.jpg') }}');">
                                 </div>
                             </div>
                             <!-- end slider item -->
                             <!-- start slider item -->
                             <div class="swiper-slide">
                                 <div class="position-absolute left-0px top-0px w-100 h-100 cover-background background-position-center-top"
-                                    style="background-image:url('https://127.0.0.1:8000/storage/images/illustration/suitify_illustration_photo_01.jpg');">
+                                    style="background-image:url({{ asset('images/illustration/suitify_illustration_photo_01.jpg') }});">
                                 </div>
                             </div>
                             <!-- end slider item -->
                             <!-- start slider item -->
                             <div class="swiper-slide">
                                 <div class="position-absolute left-0px top-0px w-100 h-100 cover-background background-position-center-top"
-                                    style="background-image:url('https://127.0.0.1:8000/storage/images/illustration/suitify_illustration_photo_01.jpg');">
+                                    style="background-image:url({{ asset('images/illustration/suitify_illustration_photo_03.jpg') }});">
                                 </div>
                             </div>
                             <!-- end slider item -->
@@ -143,7 +143,7 @@
                     <div class="mb-10px">
                         <span class="w-25px h-1px d-inline-block bg-base-color me-5px align-middle"></span>
                         <span
-                            class="text-gradient-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Mengapa
+                            class="text-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Mengapa
                             Memilih Suitify?</span>
                     </div>
                     <h4 class="text-dark-gray alt-font fw-600 ls-minus-2px mb-20px">Mitra Terbaik untuk Pengelolaan
@@ -281,7 +281,7 @@
                                 <div class="mb-15px">
                                     <span class="w-25px h-1px d-inline-block bg-base-color me-5px align-middle"></span>
                                     <span
-                                        class="text-gradient-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Pemesanan</span>
+                                        class="text-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Pemesanan</span>
                                 </div>
                                 <h1 class="text-dark-gray alt-font fw-600 ls-minus-4px mb-25px">Sistem Pemesanan
                                     Real-Time.
@@ -328,7 +328,7 @@
                                 <div class="mb-15px">
                                     <span class="w-25px h-1px d-inline-block bg-base-color me-5px align-middle"></span>
                                     <span
-                                        class="text-gradient-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Monitoring
+                                        class="text-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Monitoring
                                         Ketersediaan Kamar</span>
                                 </div>
                                 <h1 class="text-dark-gray alt-font fw-600 ls-minus-4px mb-25px">Pemantauan Ketersediaan
@@ -375,7 +375,7 @@
                                 <div class="mb-15px">
                                     <span class="w-25px h-1px d-inline-block bg-base-color me-5px align-middle"></span>
                                     <span
-                                        class="text-gradient-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Analisis
+                                        class="text-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Analisis
                                         Data</span>
                                 </div>
                                 <h1 class="text-dark-gray alt-font fw-600 ls-minus-4px mb-25px">Laporan dan Analisis.
@@ -411,7 +411,7 @@
                     <div class="mb-10px">
                         <span class="w-25px h-1px d-inline-block bg-base-color me-5px align-middle"></span>
                         <span
-                            class="text-gradient-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Layanan
+                            class="text-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Layanan
                             Suitify</span>
                     </div>
                     <h4 class="text-dark-gray alt-font fw-600 w-90 ls-minus-2px">Layanan Suitify
@@ -663,7 +663,7 @@
                                         class="text-decoration-line-bottom-medium fw-700">wonderful</span> services you
                                     offer locally are great for our community. People are tired of having to travel out
                                     of town for things.</h5>
-                                <span class="text-gradient-base-color fw-700 text-uppercase ls-1px">@Herman
+                                <span class="text-base-color fw-700 text-uppercase ls-1px">@Herman
                                     miller</span>
                             </div>
                             <!-- end review item -->
@@ -673,7 +673,7 @@
                                     amazing theme and <span
                                         class="text-decoration-line-bottom-medium fw-700">awesome</span> design with
                                     possibilities. It's so very easy to use and to customize everything.</h5>
-                                <span class="text-gradient-base-color fw-700 text-uppercase ls-1px">@Alexander
+                                <span class="text-base-color fw-700 text-uppercase ls-1px">@Alexander
                                     Harad</span>
                             </div>
                             <!-- end review item -->
@@ -683,7 +683,7 @@
                                     design companies and then there are user <span
                                         class="text-decoration-line-bottom-medium fw-700">experience.</span> Simply the
                                     great designs and best theme for fast loading website.</h5>
-                                <span class="text-gradient-base-color fw-700 text-uppercase ls-1px">@Jacob
+                                <span class="text-base-color fw-700 text-uppercase ls-1px">@Jacob
                                     Kalling</span>
                             </div>
                             <!-- end review item -->

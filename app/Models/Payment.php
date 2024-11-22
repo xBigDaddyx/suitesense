@@ -6,6 +6,7 @@ use App\Enums\PaymentStatus;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Wildside\Userstamps\Userstamps;
@@ -15,6 +16,7 @@ class Payment extends Model
     use HasUuids;
     use SoftDeletes;
     use Userstamps;
+    use HasFactory;
     protected static function booted(): void
     {
         parent::booted();

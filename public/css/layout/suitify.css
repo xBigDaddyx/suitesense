@@ -5,10 +5,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 /* variable */
-:root {     
-    --base-color: #e99022; 
+:root {
+    --base-color: #7e5bc6;
     --medium-gray: #7b7a7a;
-    --dark-gray: #1d1d1d;  
+    --dark-gray: #1d1d1d;
     --charcoal-blue: #232323;
     --alt-font: 'Space Grotesk', sans-serif;
     --primary-font: 'Inter', sans-serif;
@@ -22,7 +22,7 @@ a:hover {
 h1, .h1 {
     line-height: 4rem;
 }
-h3, .h3 { 
+h3, .h3 {
     line-height: 2.813rem;
 }
 h4 {
@@ -93,14 +93,14 @@ header .navbar-brand img {
   height: 550px !important;
 }
 .swiper-pagination-progress .swiper-progress {
-    background-color: var(--dark-gray); 
+    background-color: var(--dark-gray);
 }
 .magic-drag-cursor #ball-cursor:before {
     font-weight: 500;
 }
 /* text gradient color */
 .text-gradient-base-color {
-    background-image: linear-gradient(to right, #e97522 0%, #1ea3b1 100%); 
+    background-image: linear-gradient(to right, #e97522 0%, #1ea3b1 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -111,7 +111,7 @@ header .navbar-brand img {
     color: #1ea3b1;
 }
 /* bg gradient color */
-.bg-gradient-top-very-light-gray { 
+.bg-gradient-top-very-light-gray {
     background-image:linear-gradient(to right, #fbf3e9, #f9f4eb, #f4f4f0, #f2f4f2, #eff4f4);
 }
 .bg-linen {
@@ -163,7 +163,7 @@ footer .footer-logo img {
 }
 /* z-index */
 .z-index-99 {
-    z-index: 99; 
+    z-index: 99;
 }
 @media (min-width: 992px) {
     .navbar .navbar-nav .dropdown.dropdown-with-icon-style02 .dropdown-menu li a {

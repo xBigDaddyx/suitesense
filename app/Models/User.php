@@ -87,7 +87,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
         return $this->latestHotel;
     }
 
-    public function latestTeam(): BelongsTo
+    public function latestHotel(): BelongsTo
     {
         return $this->belongsTo(Hotel::class, 'hotel_id');
     }

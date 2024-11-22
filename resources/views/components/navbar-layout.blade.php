@@ -4,16 +4,19 @@
      <nav class="navbar navbar-expand-lg header-light bg-white header-reverse glass-effect">
          <div class="container-fluid">
              <div class="col-auto col-lg-2 me-lg-0 me-auto">
-                 <a class="navbar-brand" href="demo-branding-agency.html">
-                     <img src="images/demo-branding-agency-logo-black.png"
-                         data-at2x="images/demo-branding-agency-logo-black@2x.png" alt="" class="default-logo">
-                     <img src="images/demo-branding-agency-logo-black.png"
-                         data-at2x="images/demo-branding-agency-logo-black@2x.png" alt="" class="alt-logo">
-                     <img src="images/demo-branding-agency-logo-black.png"
-                         data-at2x="images/demo-branding-agency-logo-black@2x.png" alt="" class="mobile-logo">
+                 <a class="navbar-brand" href="/">
+                     <img src="{{ asset('images/logo/suite_sense_logo_white.png') }}"
+                         data-at2x="{{ asset('images/logo/suite_sense_logo_white.png') }}" alt=""
+                         class="default-logo">
+                     <img src="{{ asset('images/logo/suite_sense_logo_dark.png') }}"
+                         data-at2x="{{ asset('images/logo/suite_sense_logo_dark.png') }}" alt=""
+                         class="alt-logo">
+                     <img src="{{ asset('images/logo/suite_sense_logo_dark.png') }}"
+                         data-at2x="{{ asset('images/logo/suite_sense_logo_dark.png') }}" alt=""
+                         class="mobile-logo">
                  </a>
              </div>
-             <div class="col-auto ms-auto md-ms-0 menu-order position-static">
+             {{-- <div class="col-auto ms-auto md-ms-0 menu-order position-static">
                  <button class="navbar-toggler float-start" type="button" data-bs-toggle="collapse"
                      data-bs-target="#navbarNav" aria-controls="navbarNav" aria-label="Toggle navigation">
                      <span class="navbar-toggler-line"></span>
@@ -60,7 +63,7 @@
                          </a>
                      </div>
                  </div>
-             </div>
+             </div> --}}
          </div>
      </nav>
      <!-- end navigation -->

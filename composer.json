@@ -10,6 +10,7 @@
         "codewithdennis/filament-simple-alert": "v3.0.11",
         "filament/filament": "^3.2",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
+        "flowframe/laravel-trend": "^0.3.0",
         "husam-tariq/filament-timepicker": "^3.0",
         "jaocero/radio-deck": "^1.2",
         "laravel/framework": "^11.9",
