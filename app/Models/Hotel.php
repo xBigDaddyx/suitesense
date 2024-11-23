@@ -27,7 +27,7 @@ class Hotel extends Model
     }
     public function users(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'hotel_user', 'hotel_id', 'user_id');
+        return $this->belongsToMany(User::class, 'hotel_user');
     }
     public function getCurrentTenantLabel(): string
     {

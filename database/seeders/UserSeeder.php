@@ -33,6 +33,6 @@ class UserSeeder extends Seeder
             'hotel_id' => $hotel->id,
         ]);
         $user1->assignRole('Vendor');
-        $user1->hotels()->attach($hotel, ['department', 'Vendor']);
+        $user1->hotels()->attach($hotel, ['department' => 'Vendor']);
     }
 }

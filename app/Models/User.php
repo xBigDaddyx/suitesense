@@ -66,7 +66,7 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     }
     public function hotels(): BelongsToMany
     {
-        return $this->belongsToMany(Hotel::class, 'hotel_user', 'user_id', 'hotel_id')->withPivot('department', 'job_title')->withTimestamps();
+        return $this->belongsToMany(Hotel::class, 'hotel_user')->withPivot('department', 'job_title')->withTimestamps();
     }
 
     public function getTenants(Panel $panel): Collection
