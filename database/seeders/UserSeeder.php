@@ -16,13 +16,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $hotel =  Hotel::create([
-            'name' => 'Hotel Suitify',
-            'address' => '123 Main Street, Anytown, USA',
-            'country' => 'US',
-            'city' => 'Anytown',
-            'phone' => '08123456789',
-        ]);
+        $hotel =  Hotel::where('name', 'Hotel Suitify')->first();
         $user1 = User::create([
             'name' => 'Faisal Yusuf',
             'email' => 'admin@suitify.cloud',
