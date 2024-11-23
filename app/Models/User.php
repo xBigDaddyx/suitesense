@@ -26,10 +26,10 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     public static function boot()
     {
         parent::boot();
-        static::creating(function ($user) {
-            $user->latestHotel()->associate(Hotel::find(1));
-            $user->hotels()->attach(Hotel::find(1), ['department' => 'Vendor', 'job_title' => 'System Administrator']);
-        });
+        // static::creating(function ($user) {
+        //     $user->latestHotel()->associate(Hotel::find(1));
+        //     $user->hotels()->attach(Hotel::find(1), ['department' => 'Vendor', 'job_title' => 'System Administrator']);
+        // });
     }
     /**
      * The attributes that are mass assignable.
