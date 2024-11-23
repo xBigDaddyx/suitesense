@@ -746,27 +746,27 @@
                 <div class="col-md-2 offset-lg-1 col-6 order-3 order-md-2">
                     <span class="alt-font fs-14 text-uppercase mb-5px d-block text-white ls-1px">Company</span>
                     <ul>
-                        <li><a href="demo-branding-agency.html">Home</a></li>
+                        {{-- <li><a href="demo-branding-agency.html">Home</a></li>
                         <li><a href="demo-branding-agency-about.html">Agency</a></li>
                         <li><a href="demo-branding-agency-services.html">Services</a></li>
                         <li><a href="demo-branding-agency-portfolio.html">Portfolio</a></li>
-                        <li><a href="demo-branding-agency-contact.html">Contact</a></li>
+                        <li><a href="demo-branding-agency-contact.html">Contact</a></li> --}}
                     </ul>
                 </div>
                 <div class="col-md-2 col-6 order-3 order-md-3">
                     <span class="alt-font fs-14 text-uppercase mb-5px d-block text-white ls-1px">Follow Us</span>
                     <ul>
-                        <li><a href="https://www.pinterest.com/" target="_blank">Pinterest</a></li>
+                        {{-- <li><a href="https://www.pinterest.com/" target="_blank">Pinterest</a></li>
                         <li><a href="http://www.twitter.com" target="_blank">Twitter</a></li>
                         <li><a href="http://www.dribbble.com" target="_blank">Dribbble</a></li>
                         <li><a href="http://www.instagram.com" target="_blank">Instagram</a></li>
-                        <li><a href="http://www.behance.com" target="_blank">Behance</a></li>
+                        <li><a href="http://www.behance.com" target="_blank">Behance</a></li> --}}
                     </ul>
                 </div>
                 <div class="col-md-2 order-1 order-md-4 sm-mb-30px">
                     <a href="demo-branding-agency.html" class="footer-logo"><img
-                            src="images/demo-branding-agency-white-logo.png"
-                            data-at2x="images/demo-branding-agency-white-logo@2x.png" alt=""></a>
+                            src="{{ asset('images/logo/suite_sense_logo_dark.png') }}"
+                            data-at2x="{{ asset('images/logo/suite_sense_logo_dark.png') }}" alt=""></a>
                 </div>
             </div>
             <div class="row">

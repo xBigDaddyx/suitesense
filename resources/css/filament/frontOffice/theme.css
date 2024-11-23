@@ -2,16 +2,26 @@
 @import '/vendor/awcodes/filament-table-repeater/resources/css/plugin.css';
 @config 'tailwind.config.js';
 
+.fi-breadcrumbs-item-label {
+    @apply text-primary-400;
+}
 .fi-ta-header-toolbar {
-    @apply bg-gray-100 dark:bg-gray-800;
+    @apply bg-primary-50 dark:bg-gray-800;
 }
-
 .fi-ta-header {
-    @apply bg-gray-50 dark:bg-gray-800;
+    @apply bg-primary-100 dark:bg-gray-800 border-none;
 }
-
+.fi-section-header-icon {
+    @apply text-white dark:text-white border-none;
+}
+.fi-section-header-heading {
+    @apply text-white;
+}
+.fi-section-header-description {
+    @apply text-white dark:text-white;
+}
 .fi-section-header {
-    @apply bg-gray-100 dark:bg-gray-800 rounded-t-xl;
+    @apply bg-primary-500 dark:bg-primary-800 rounded-t-xl;
 }
 /* width */
 ::-webkit-scrollbar {
@@ -88,9 +98,11 @@
 .fi-sidebar-item-active svg {
     @apply text-white dark:text-white;
 }
-
+.fi-page-sub-navigation-sidebar-ctn {
+    @apply border border-gray-100 rounded-xl p-4 shadow-sm;
+}
 .fi-sidebar-item:not(.fi-sidebar-item-active) a {
-    @apply dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800/50 dark:hover:text-white;
+    @apply dark:text-gray-400 hover:bg-primary-100 dark:hover:bg-gray-800/50 dark:hover:text-white;
 }
 
 .fi-sidebar-item:not(.fi-sidebar-item-active):hover a svg {
@@ -102,11 +114,12 @@
 }
 
 .fi-topbar nav {
-    @apply bg-transparent dark:bg-gray-900 ring-0 shadow-none;
+    @apply bg-transparent dark:bg-transparent ring-0 shadow-none;
 }
 
 .fi-layout {
-    @apply bg-[#F9FAFB] dark:bg-gray-900;
+    @apply bg-primary-100 dark:bg-primary-950;
+    /* @apply bg-[#F9FAFB] dark:bg-gray-900; */
 }
 
 .fi-main {

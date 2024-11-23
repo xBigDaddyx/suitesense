@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\CreateInvoice;
 use App\Http\Controllers\ReservationDailyReportController;
+use GlennRaya\Xendivel\Xendivel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -11,3 +14,10 @@ Route::get('/reservation/daily-report/{date}', ReservationDailyReportController:
 // Route::prefix('reports')->group(function () {
 //     Route::get('/summary-reservation', SummaryReservationReport::class)->name('summary-reservation-report');
 // });
+
+
+Route::post('/pay-via-ewallet', function (Request $request) {
+    $response = Xendivel::payWithEwallet($request)
+        ->getResponse();
+    return $response;
+});

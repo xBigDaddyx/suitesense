@@ -11,6 +11,7 @@
         "filament/filament": "^3.2",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "flowframe/laravel-trend": "^0.3.0",
+        "glennraya/xendivel": "^2.0",
         "husam-tariq/filament-timepicker": "^3.0",
         "jaocero/radio-deck": "^1.2",
         "laravel/framework": "^11.9",
@@ -21,7 +22,8 @@
         "saade/filament-fullcalendar": "*",
         "spatie/laravel-pdf": "^1.5",
         "spatie/laravel-permission": "^6.10",
-        "wildside/userstamps": "^2.4"
+        "wildside/userstamps": "^2.4",
+        "xendit/xendit-php": "^6.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

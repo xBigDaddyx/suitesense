@@ -9,7 +9,7 @@
                          data-at2x="{{ asset('images/logo/suite_sense_logo_white.png') }}" alt=""
                          class="default-logo">
                      <img src="{{ asset('images/logo/suite_sense_logo_white.png') }}"
-                         data-at2x="{{ asset('images/logo/suite_sense_logo_white.png') }}" alt=""
+                         data-at2x="{{ asset('images/logo/suite_sense_logo_white.png') }}" alt="ff"
                          class="alt-logo">
                      <img src="{{ asset('images/logo/suite_sense_logo_white.png') }}"
                          data-at2x="{{ asset('images/logo/suite_sense_logo_white.png') }}" alt=""
