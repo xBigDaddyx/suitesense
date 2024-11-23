@@ -1,3 +1,169 @@
 @import '/vendor/filament/filament/resources/css/theme.css';
-
+@import '/vendor/awcodes/filament-table-repeater/resources/css/plugin.css';
 @config 'tailwind.config.js';
+
+/* .dark .fi-simple-main-ctn {
+    background-image: url('images/suitify_background_white.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+} */
+
+/* .fi-ta-header-toolbar {
+    @apply bg-primary-100 dark:bg-gray-800;
+} */
+
+.fi-simple-main {
+    background-image: url('/images/suitify_background_white.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+
+.fi-breadcrumbs-item-label {
+    @apply text-primary-400;
+}
+.fi-ta-header-toolbar {
+    @apply bg-primary-50 dark:bg-gray-800;
+}
+.fi-ta-header {
+    @apply bg-primary-100 dark:bg-gray-800 border-none;
+}
+.fi-section-header-icon {
+    @apply text-white dark:text-white border-none;
+}
+.fi-section-header-heading {
+    @apply text-white;
+}
+.fi-section-header-description {
+    @apply text-white dark:text-white;
+}
+.fi-section-header {
+    @apply bg-primary-500 dark:bg-primary-800 rounded-t-xl;
+}
+/* width */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    @apply rounded-xl bg-primary-50 dark:bg-gray-700;
+
+
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    @apply rounded-xl bg-primary-500 dark:bg-primary-600;
+
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-400 dark:bg-primary-500;
+}
+
+/* .fi-simple-main-ctn {
+    background-image: url('/storage/images/dolphin_directory_bg_01.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+
+.dark .fi-simple-main-ctn {
+    background-image: url('/storage/images/dolphin_directory_bg_02.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+} */
+
+
+
+/* .fi-layout {
+    background-image: url('/storage/images/dolphin_directory_bg_01.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+} */
+
+.fi-simple-main {
+    @apply shadow-md;
+}
+
+.fi-simple-header-heading {
+    @apply text-primary-500;
+}
+
+.fi-sidebar {
+    @apply p-4 !important;
+}
+
+.fi-sidebar-header {
+    @apply bg-transparent ring-0 shadow-none !important;
+}
+
+.fi-sidebar-item-active a {
+    @apply bg-primary-600 dark:bg-primary-600 hover:bg-primary-600 dark:hover:bg-primary-600 text-white dark:text-white;
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-label {
+    @apply text-white dark:text-white;
+}
+
+.fi-sidebar-item-active svg {
+    @apply text-white dark:text-white;
+}
+.fi-page-sub-navigation-sidebar-ctn {
+    @apply border border-gray-100 rounded-xl p-4 shadow-sm;
+}
+.fi-sidebar-item:not(.fi-sidebar-item-active) a {
+    @apply dark:text-gray-400 hover:bg-primary-100 dark:hover:bg-gray-800/50 dark:hover:text-white;
+}
+
+.fi-sidebar-item:not(.fi-sidebar-item-active):hover a svg {
+    @apply dark:text-white;
+}
+
+.fi-topbar {
+    @apply relative;
+}
+
+.fi-topbar nav {
+    @apply bg-transparent dark:bg-transparent ring-0 shadow-none;
+}
+
+.fi-layout {
+    @apply bg-primary-100 dark:bg-primary-950;
+    /* @apply bg-[#F9FAFB] dark:bg-gray-900; */
+}
+
+.fi-main {
+    @apply bg-white dark:bg-gray-800 ltr:rounded-tl-3xl rtl:rounded-tr-3xl shadow !max-w-full !overflow-y-auto flex-grow;
+}
+
+.fi-main-ctn {
+    @apply !h-screen;
+}
+
+
+.fi-wi-stats-overview-stat {
+    @apply border border-gray-200 ring-0;
+}
+
+
+
+.fi-fo-tabs {
+    @apply ring-0 shadow-md border border-gray-200;
+}
+
+
+
+
+
+.fi-header-heading {
+    @apply text-primary-500 dark:text-primary-600;
+}

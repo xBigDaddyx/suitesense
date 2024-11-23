@@ -25,11 +25,11 @@ class VendorPanelProvider extends PanelProvider
     {
         return $panel
             ->id('vendor')
-            ->path('vendor')
+            ->path('manage')
             ->viteTheme('resources/css/filament/vendor/theme.css')
-            ->domain('management.suitify.cloud')
             ->databaseNotifications()
             ->login()
+            ->registration()
             ->maxContentWidth(MaxWidth::Full)
             ->font('Poppins')
             ->sidebarCollapsibleOnDesktop()
@@ -58,10 +58,24 @@ class VendorPanelProvider extends PanelProvider
                 ],
             ])
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => [
+                    '50' => '#f7f6fc',
+                    '100' => '#efedfa',
+                    '200' => '#e1def6',
+                    '300' => '#cbc4ee',
+                    '400' => '#b0a2e3',
+                    '500' => '#947cd6',
+                    '600' => '#7e5bc6',
+                    '700' => '#714db4',
+                    '800' => '#5e4097',
+                    '900' => '#4e367c',
+                    '950' => '#312253',
+
+                ],
             ])
             ->discoverResources(in: app_path('Filament/Vendor/Resources'), for: 'App\\Filament\\Vendor\\Resources')
             ->discoverPages(in: app_path('Filament/Vendor/Pages'), for: 'App\\Filament\\Vendor\\Pages')
+            ->discoverClusters(in: app_path('Filament/Vendor/Clusters'), for: 'App\\Filament\\Vendor\\Clusters')
             ->pages([
                 Pages\Dashboard::class,
             ])
