@@ -24,9 +24,9 @@ class VendorPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('vendor')
+            ->id('manage')
             ->path('manage')
-            ->viteTheme('resources/css/filament/vendor/theme.css')
+            ->viteTheme('resources/css/filament/manage/theme.css')
             ->domain('manage.suitify.cloud')
             ->databaseNotifications()
             ->login()
