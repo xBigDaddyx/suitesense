@@ -27,6 +27,7 @@ class VendorPanelProvider extends PanelProvider
             ->id('vendor')
             ->path('manage')
             ->viteTheme('resources/css/filament/vendor/theme.css')
+            ->domain('manage.suitify.cloud')
             ->databaseNotifications()
             ->login()
             ->registration()
