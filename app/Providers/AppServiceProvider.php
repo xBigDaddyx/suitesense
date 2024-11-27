@@ -19,6 +19,7 @@ use Filament\Support\Facades\FilamentColor;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
+use Xendit\Configuration;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Configuration::setXenditKey(env('XENDIT_SECRET_KEY'));
         if (env('APP_ENV') == 'production') {
             URL::forceScheme('https');
         }

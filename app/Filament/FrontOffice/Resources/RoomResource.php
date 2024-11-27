@@ -194,6 +194,9 @@ class RoomResource extends Resource
                     ->conversion('preview')
                     ->collection('room-photos')
                     ->label(trans('frontOffice.room.imageLabel')),
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable()
+                    ->label(trans('frontOffice.room.nameLabel')),
                 // Tables\Columns\TextColumn::make('id')
                 //     ->label('ID'),
                 // Tables\Columns\TextColumn::make('hotel.name')

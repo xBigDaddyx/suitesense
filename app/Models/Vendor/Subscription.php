@@ -2,6 +2,7 @@
 
 namespace App\Models\Vendor;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +14,7 @@ class Subscription extends Model
     use HasUuids;
     use SoftDeletes;
     use Userstamps;
-    protected $fillable = ['customer_id', 'plan_id', 'starts_at', 'ends_at', 'is_active', 'number', 'number_series', 'number_subscription'];
+    protected $fillable = ['customer_id', 'order_id', 'plan_id', 'starts_at', 'ends_at', 'is_active', 'number', 'number_series', 'number_subscription'];
     protected $casts = [
         'is_active' => 'boolean',
 
@@ -32,9 +33,9 @@ class Subscription extends Model
             $model->number = $model->number_series . '-' . $model->number_subscription;
         });
     }
-    public function customer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function hotel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Hotel::class);
     }
     public function plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -43,6 +44,10 @@ class Subscription extends Model
     public function licenses(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(License::class);
+    }
+    public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 
     public function isActive()

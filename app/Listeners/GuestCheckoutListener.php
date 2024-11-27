@@ -47,7 +47,14 @@ class GuestCheckoutListener
                         ->color('primary')
                         ->body('Guest check-out is complete. Thank you for your service!')
                         ->broadcast($event->user);
+                    Notifications\Notification::make()
+                        ->title('Check-Out Successful! ✅')
+                        ->success()
+                        ->color('primary')
+                        ->body('Guest check-out is complete. Thank you for your service!')
+                        ->sendToDatabase($event->user);
                     break;
+
                 case false:
                     Notifications\Notification::make()
                         ->title('Check-Out Failed! ❌')
@@ -55,6 +62,12 @@ class GuestCheckoutListener
                         ->color('danger')
                         ->body('An error occurred during the check-out process. Please try again or contact support.')
                         ->broadcast($event->user);
+                    Notifications\Notification::make()
+                        ->title('Check-Out Failed! ❌')
+                        ->danger()
+                        ->color('danger')
+                        ->body('An error occurred during the check-out process. Please try again or contact support.')
+                        ->sendToDatabase($event->user);
                     break;
             }
         } else {
@@ -72,6 +85,20 @@ class GuestCheckoutListener
                         }, true)
                         ->button(),
                 ])->broadcast($event->user);
+            Notifications\Notification::make()
+                ->title('Reservation payment is required')
+                ->seconds(20)
+                ->danger()
+                ->color('danger')
+                ->body('This pending payment on the reservation needs to be resolved.')
+                ->actions([
+                    Notifications\Actions\Action::make('view')
+                        ->label('View Payment')
+                        ->url(function () use ($record) {
+                            return route('filament.frontOffice.resources.reservations.managePayments', ['tenant' => Filament::getTenant(), 'record' => $record]);
+                        }, true)
+                        ->button(),
+                ])->sendToDatabase($event->user);
         }
     }
 }

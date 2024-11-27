@@ -43,7 +43,7 @@ class RoomStatisticDashboard extends \Filament\Pages\Dashboard
                         //     $component->state(Carbon::now()->endOfMonth()->format('Y-m-d'));
                         // }),
                     ])
-                    ->columns(3),
+                    ->columns(2),
             ]);
     }
     public function getColumns(): int|string|array

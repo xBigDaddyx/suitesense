@@ -2,6 +2,76 @@
 @import '/vendor/awcodes/filament-table-repeater/resources/css/plugin.css';
 @config 'tailwind.config.js';
 
+@layer base {
+    :root {
+        --color-primary: #7c3aed;
+        --color-primary-hover: #955FF0;
+        --color-primary-content: #ffffff;
+        --color-primary-dark: #5f14e0;
+        --color-primary-light: #9b69f1;
+
+        --color-secondary: #ed3a51;
+        --color-secondary-content: #ffffff;
+        --color-secondary-dark: #e0142f;
+        --color-secondary-light: #f1697a;
+
+        --color-background: #efeff1;
+        --color-foreground: #fbfbfb;
+        --color-border: #dedde2;
+
+        --color-copy: #252329;
+        --color-copy-light: #645e6e;
+        --color-copy-lighter: #8a8495;
+
+        --color-success: #3aed3a;
+        --color-success-light: #5FF05F;
+        --color-warning: #eded3a;
+        --color-error: #ed3a3a;
+        --color-success-content: #032503;
+        --color-warning-content: #252503;
+        --color-error-content: #ffffff;
+
+
+    }
+  }
+  .bg-success:hover{
+    background-color: var(--color-success-light);
+}
+.bg-success {
+    background-color: var(--color-success);
+}
+  .bg-secondary:hover{
+    background-color: var(--color-secondary-light);
+}
+.bg-secondary {
+    background-color: var(--color-secondary);
+}
+  .bg-warning {
+    background-color: var(--color-warning);
+  }
+  .bg-danger {
+    background-color: var(--color-error);
+  }
+.bg-primary:hover{
+    background-color: var(--color-primary-light);
+}
+.text-primary {
+    color: var(--color-primary);
+}
+.bg-primary {
+    background-color: var(--color-primary);
+}
+
+.text-success-content {
+    color:var(--color-success-conten);
+}
+.bg-success-content {
+    background-color: var(--color-success-content);
+}
+
+.fi-modal-window{
+    @apply bg-primary-100 ;
+}
 .fi-breadcrumbs-item-label {
     @apply text-primary-400;
 }
@@ -9,7 +79,7 @@
     @apply bg-primary-50 dark:bg-gray-800;
 }
 .fi-ta-header {
-    @apply bg-primary-100 dark:bg-gray-800 border-none;
+    @apply bg-primary-100 dark:bg-gray-700 border-none;
 }
 .fi-section-header-icon {
     @apply text-white dark:text-white border-none;
@@ -99,7 +169,7 @@
     @apply text-white dark:text-white;
 }
 .fi-page-sub-navigation-sidebar-ctn {
-    @apply border border-gray-100 rounded-xl p-4 shadow-sm;
+    @apply border border-gray-100 dark:border-gray-700 rounded-xl p-4 shadow-sm;
 }
 .fi-sidebar-item:not(.fi-sidebar-item-active) a {
     @apply dark:text-gray-400 hover:bg-primary-100 dark:hover:bg-gray-800/50 dark:hover:text-white;
@@ -118,7 +188,7 @@
 }
 
 .fi-layout {
-    @apply bg-primary-100 dark:bg-primary-950;
+    @apply bg-primary-100 dark:bg-gray-900;
     /* @apply bg-[#F9FAFB] dark:bg-gray-900; */
 }
 

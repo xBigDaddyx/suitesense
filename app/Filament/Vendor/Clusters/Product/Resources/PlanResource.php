@@ -44,7 +44,7 @@ class PlanResource extends Resource
                                 ->default(true)
                                 ->inline(false)
                                 ->required(),
-                            Forms\Components\RichEditor::make('description')
+                            Forms\Components\Textarea::make('description')
                                 ->columnSpanFull()
                                 ->maxLength(255),
 

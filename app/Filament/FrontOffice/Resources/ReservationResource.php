@@ -13,6 +13,8 @@ use App\Events\CancelReservationEvent;
 use App\Events\GuestCheckinEvent;
 use App\Events\GuestCheckoutEvent;
 use App\Filament\FrontOffice\Resources\ReservationResource\Pages;
+use App\Filament\FrontOffice\Resources\ReservationResource\Pages\CreateReservation;
+use App\Filament\FrontOffice\Resources\ReservationResource\Pages\EditReservation;
 use App\Filament\FrontOffice\Resources\ReservationResource\RelationManagers;
 use App\Filament\FrontOffice\Resources\RoomResource\Pages\ManageReservations;
 use App\Models\Guest;
@@ -46,6 +48,7 @@ use stdClass;
 use Filament\Notifications;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Enums\IconSize;
 use Filament\Support\RawJs;
 use Illuminate\Database\Eloquent\Collection;
@@ -134,153 +137,232 @@ class ReservationResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Group::make([
-                    Forms\Components\Section::make('Guest Details')
-                        ->description('Please provide the necessary information to add a new reservation. Make sure to fill in all required fields.')
-                        ->icon('tabler-user')
-                        ->columns(3)
-                        ->schema([
-                            Forms\Components\Select::make('guest_id')
-                                ->allowHtml()
-                                ->columnSpanFull()
-                                ->relationship('guest', 'name')
-                                ->loadingMessage('Loading guests...')
-                                ->searchable(['name', 'email', 'identity_number', 'phone'])
-                                ->searchPrompt('Search guest by their name, identity number, email or phone.')
-                                ->native(false)
-                                ->getOptionLabelFromRecordUsing(fn(Model $record) => "<span class='text-primary-500 font-bold'>{$record->name}</span> <br>Email : {$record->email}<br>Phone : {$record->phone}<br>Address : {$record->address}")
-                                ->editOptionForm([
-                                    Forms\Components\Section::make('Guest Details')
-                                        ->description('Please provide the necessary information to add a new reservation. Make sure to fill in all required fields.')
-                                        ->icon('tabler-user')
-                                        ->columns(2)
-                                        ->schema([
-                                            Forms\Components\TextInput::make('name')
-                                                ->label(trans('frontOffice.guest.nameLabel'))
-                                                ->required(),
-                                            Forms\Components\TextInput::make('identity_number')
-                                                ->required()
-                                                ->label(trans('frontOffice.guest.identityNumberLabel')),
-                                            Forms\Components\TextInput::make('email')
-                                                ->label(trans('frontOffice.guest.emailLabel'))
-                                                ->email(),
-                                            Forms\Components\TextInput::make('phone')
-                                                ->label(trans('frontOffice.guest.phoneLabel')),
-
-                                        ]),
-                                ])
-                                ->createOptionAction(
-                                    fn(Forms\Components\Actions\Action $action) => $action
-                                        ->label('Create Guest')
-                                        ->modalHeading('Create Guest')
-                                        ->modalDescription('Please provide the necessary information to add a new guest.')
-                                        ->modalSubmitActionLabel('Add Guest')
-                                        ->modalIcon('tabler-user')
-                                        ->icon('tabler-user-plus')
-                                        ->color('primary')
-                                        ->modalWidth('3xl'),
-                                )
-                                ->createOptionForm([
-                                    Forms\Components\Section::make()
-                                        ->columns(2)
-                                        ->schema([
-                                            Forms\Components\TextInput::make('name')
-
-                                                ->label(trans('frontOffice.guest.nameLabel'))
-                                                ->prefixIcon('tabler-user')
-                                                ->prefixIconColor('primary')
-                                                ->required(),
-                                            Forms\Components\TextInput::make('identity_number')
-                                                ->prefixIcon('tabler-id-badge-2')
-                                                ->prefixIconColor('primary')
-                                                ->required()
-                                                ->label(trans('frontOffice.guest.identityNumberLabel')),
-                                            Forms\Components\TextInput::make('email')
-                                                ->prefixIcon('tabler-mail')
-                                                ->prefixIconColor('primary')
-                                                ->label(trans('frontOffice.guest.emailLabel'))
-                                                ->email(),
-                                            Forms\Components\TextInput::make('phone')
-                                                ->prefixIcon('tabler-phone')
-                                                ->prefixIconColor('primary')
-                                                ->label(trans('frontOffice.guest.phoneLabel')),
-                                            Forms\Components\RichEditor::make('address')
-                                                ->columnSpanFull()
-                                                ->label(trans('frontOffice.guest.addressLabel')),
-
-                                        ]),
-
-                                ])
-                                ->required(),
-                        ]),
-                ]),
-                Forms\Components\Group::make([
-                    Forms\Components\Section::make('Reservation Details')
-                        ->hiddenOn(ManageReservations::class)
-                        ->description('Please provide the necessary information to add a new reservation. Make sure to fill in all required fields.')
-                        ->icon('tabler-file-text')
-                        ->columns(2)
-                        ->schema([
-                            \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('reservation_source')->required()
-                                ->columnSpanFull()
-                                ->label(trans('frontOffice.reservation.reservationSourceLabel'))
-                                ->columns(2)
-                                ->descriptions(collect(ReservationSource::cases())->mapWithKeys(fn($description) => [
-                                    $description->value => $description->description(),
-                                ])->toArray())
-                                ->icons(collect(ReservationSource::cases())->mapWithKeys(fn($icon) => [
-                                    $icon->value => $icon->icon(),
-                                ])->toArray())
-                                ->options(collect(ReservationSource::cases())->mapWithKeys(fn($source) => [
-                                    $source->value => $source->label(),
-                                ])->toArray())
-                                ->color('primary'),
-                            Forms\Components\Select::make('room_type')
-                                ->columnSpanFull()
-                                ->label(trans('frontOffice.reservation.roomTypeLabel'))
-                                ->options(collect(RoomType::all())->mapWithKeys(fn($roomType) => [
-                                    $roomType->id => '<strong>' . $roomType->name . '</strong><br>' . $roomType->description ?? '-',
-                                ])->toArray())
-                                ->searchable()
-                                ->native(false)
-                                ->required()
-                                ->allowHtml()
-                                ->live(),
-                            Forms\Components\Section::make('Select Room')
-
-                                ->visible(fn(Get $get): bool => $get('room_type') !== null)
+                Forms\Components\Grid::make(3)
+                    ->schema([
+                        Forms\Components\Group::make([
+                            Forms\Components\Section::make('Guest Details')
+                                ->description('Please provide the necessary information to add a new reservation. Make sure to fill in all required fields.')
+                                ->icon('tabler-user')
                                 ->schema([
-                                    // Forms\Components\Placeholder::make('price')
-                                    //     ->label(trans('frontOffice.reservation.priceLabel'))
-                                    //     ->content(fn(Get $get): string =>  trans('frontOffice.reservation.priceCurrency') . ' ' . number_format(Room::find($get('room_id'))->price, 2) . '/night')
-                                    //     ->visible(fn(Get $get): bool => $get('room_id') !== null),
-                                    \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('room_id')
-                                        ->live()
-                                        ->hiddenLabel()
-                                        ->columns(4)
-                                        ->visible(fn(Get $get): bool => $get('room_type') !== null)
-                                        ->descriptions(function (Get $get) {
-                                            $rooms = Room::where('room_type_id', $get('room_type'))->where('is_available', true)->get();
-                                            return $rooms->mapWithKeys(function ($status) {
-                                                return [$status->id => trans('frontOffice.reservation.priceCurrency') . ' ' . number_format($status->price, 2) . '/night'];
-                                            })->toArray();
-                                        })
-                                        ->icons(function (Get $get) {
-                                            $rooms = Room::where('room_type_id', $get('room_type'))->where('is_available', true)->get();
-                                            return $rooms->mapWithKeys(function ($status) {
-                                                return [$status->id => 'tabler-door'];
-                                            })->toArray();
-                                        })
-                                        ->options(function (Get $get) {
-                                            $rooms = Room::availableBetween($get('check_in'), $get('check_out'), $get('room_type'))->get();
-                                            return $rooms->mapWithKeys(fn($status) => [
-                                                $status->id => $status->name . ' (Available)',
-                                            ])->toArray();
-                                        })
-                                        ->color('primary'),
+                                    Forms\Components\Select::make('guest_id')
+                                        ->allowHtml()
+                                        ->columnSpanFull()
+                                        ->relationship('guest', 'name')
+                                        ->loadingMessage('Loading guests...')
+                                        ->searchable(['name', 'email', 'identity_number', 'phone'])
+                                        ->searchPrompt('Search guest by their name, identity number, email or phone.')
+                                        ->native(false)
+                                        ->getOptionLabelFromRecordUsing(fn(Model $record) => "<span class='text-primary-500 font-bold'>{$record->name}</span> <br>Email : {$record->email}<br>Phone : {$record->phone}<br>Address : {$record->address}")
+                                        ->editOptionForm([
+                                            Forms\Components\Section::make('Guest Details')
+                                                ->description('Please provide the necessary information to add a new reservation. Make sure to fill in all required fields.')
+                                                ->icon('tabler-user')
+                                                ->columns(2)
+                                                ->schema([
+                                                    Forms\Components\TextInput::make('name')
+                                                        ->label(trans('frontOffice.guest.nameLabel'))
+                                                        ->required(),
+                                                    Forms\Components\TextInput::make('identity_number')
+                                                        ->required()
+                                                        ->label(trans('frontOffice.guest.identityNumberLabel')),
+                                                    Forms\Components\TextInput::make('email')
+                                                        ->label(trans('frontOffice.guest.emailLabel'))
+                                                        ->email(),
+                                                    Forms\Components\TextInput::make('phone')
+                                                        ->label(trans('frontOffice.guest.phoneLabel')),
+
+                                                ]),
+                                        ])
+                                        ->createOptionAction(
+                                            fn(Forms\Components\Actions\Action $action) => $action
+                                                ->label('Create Guest')
+                                                ->modalHeading('Create Guest')
+                                                ->modalDescription('Please provide the necessary information to add a new guest.')
+                                                ->modalSubmitActionLabel('Add Guest')
+                                                ->modalIcon('tabler-user')
+                                                ->icon('tabler-user-plus')
+                                                ->color('primary')
+                                                ->modalWidth('3xl'),
+                                        )
+                                        ->createOptionForm([
+                                            Forms\Components\Section::make()
+                                                ->columns(2)
+                                                ->schema([
+                                                    Forms\Components\TextInput::make('name')
+
+                                                        ->label(trans('frontOffice.guest.nameLabel'))
+                                                        ->prefixIcon('tabler-user')
+                                                        ->prefixIconColor('primary')
+                                                        ->required(),
+                                                    Forms\Components\TextInput::make('identity_number')
+                                                        ->prefixIcon('tabler-id-badge-2')
+                                                        ->prefixIconColor('primary')
+                                                        ->required()
+                                                        ->label(trans('frontOffice.guest.identityNumberLabel')),
+                                                    Forms\Components\TextInput::make('email')
+                                                        ->prefixIcon('tabler-mail')
+                                                        ->prefixIconColor('primary')
+                                                        ->label(trans('frontOffice.guest.emailLabel'))
+                                                        ->email(),
+                                                    Forms\Components\TextInput::make('phone')
+                                                        ->prefixIcon('tabler-phone')
+                                                        ->prefixIconColor('primary')
+                                                        ->label(trans('frontOffice.guest.phoneLabel')),
+                                                    Forms\Components\RichEditor::make('address')
+                                                        ->columnSpanFull()
+                                                        ->label(trans('frontOffice.guest.addressLabel')),
+
+                                                ]),
+
+                                        ])
+                                        ->required(),
                                 ]),
                         ]),
-                ]),
+                        Forms\Components\Group::make([
+                            Forms\Components\Section::make('Reservation Details')
+
+                                ->description('Please provide the necessary information to add a new reservation. Make sure to fill in all required fields.')
+                                ->icon('tabler-file-text')
+                                ->columns(2)
+                                ->schema([
+                                    \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('reservation_source')->required()
+                                        ->columnSpanFull()
+                                        ->label(trans('frontOffice.reservation.reservationSourceLabel'))
+                                        ->columns(2)
+                                        ->descriptions(collect(ReservationSource::cases())->mapWithKeys(fn($description) => [
+                                            $description->value => $description->description(),
+                                        ])->toArray())
+                                        ->icons(collect(ReservationSource::cases())->mapWithKeys(fn($icon) => [
+                                            $icon->value => $icon->icon(),
+                                        ])->toArray())
+                                        ->options(collect(ReservationSource::cases())->mapWithKeys(fn($source) => [
+                                            $source->value => $source->label(),
+                                        ])->toArray())
+                                        ->color('primary'),
+                                    Forms\Components\Select::make('room_type')
+                                        ->columnSpanFull()
+                                        ->label(trans('frontOffice.reservation.roomTypeLabel'))
+                                        ->options(collect(RoomType::all())->mapWithKeys(fn($roomType) => [
+                                            $roomType->id => '<strong>' . $roomType->name . '</strong><br>' . $roomType->description ?? '-',
+                                        ])->toArray())
+                                        ->searchable()
+                                        ->native(false)
+                                        ->required()
+                                        ->allowHtml()
+                                        ->live(),
+                                    Forms\Components\Section::make('Select Room')
+
+                                        ->visible(fn(Get $get): bool => $get('room_type') !== null)
+                                        ->schema([
+                                            // Forms\Components\Placeholder::make('price')
+                                            //     ->label(trans('frontOffice.reservation.priceLabel'))
+                                            //     ->content(fn(Get $get): string =>  trans('frontOffice.reservation.priceCurrency') . ' ' . number_format(Room::find($get('room_id'))->price, 2) . '/night')
+                                            //     ->visible(fn(Get $get): bool => $get('room_id') !== null),
+                                            \JaOcero\RadioDeck\Forms\Components\RadioDeck::make('room_id')
+                                                ->live()
+                                                ->hiddenLabel()
+                                                ->columns(4)
+                                                ->visible(fn(Get $get): bool => $get('room_type') !== null)
+                                                ->descriptions(function (Get $get) {
+                                                    $rooms = Room::where('room_type_id', $get('room_type'))->where('is_available', true)->get();
+                                                    return $rooms->mapWithKeys(function ($status) {
+                                                        return [$status->id => trans('frontOffice.reservation.priceCurrency') . ' ' . number_format($status->price, 2) . '/night'];
+                                                    })->toArray();
+                                                })
+                                                ->icons(function (Get $get) {
+                                                    $rooms = Room::where('room_type_id', $get('room_type'))->where('is_available', true)->get();
+                                                    return $rooms->mapWithKeys(function ($status) {
+                                                        return [$status->id => 'tabler-door'];
+                                                    })->toArray();
+                                                })
+                                                ->options(function (Get $get) {
+                                                    $rooms = Room::availableBetween($get('check_in'), $get('check_out'), $get('room_type'))->get();
+                                                    return $rooms->mapWithKeys(fn($status) => [
+                                                        $status->id => $status->name . ' (Available)',
+                                                    ])->toArray();
+                                                })
+                                                ->color('primary'),
+                                        ]),
+                                ]),
+                        ])->columnSpan(2),
+                    ])->hiddenOn(ManageReservations::class),
+                Forms\Components\Section::make('Guest Details')
+                    ->description('Please provide the necessary information to add a new reservation. Make sure to fill in all required fields.')
+                    ->icon('tabler-user')
+                    ->schema([
+                        Forms\Components\Select::make('guest_id')
+                            ->allowHtml()
+                            ->columnSpanFull()
+                            ->relationship('guest', 'name')
+                            ->loadingMessage('Loading guests...')
+                            ->searchable(['name', 'email', 'identity_number', 'phone'])
+                            ->searchPrompt('Search guest by their name, identity number, email or phone.')
+                            ->native(false)
+                            ->getOptionLabelFromRecordUsing(fn(Model $record) => "<span class='text-primary-500 font-bold'>{$record->name}</span> <br>Email : {$record->email}<br>Phone : {$record->phone}<br>Address : {$record->address}")
+                            ->editOptionForm([
+                                Forms\Components\Section::make('Guest Details')
+                                    ->description('Please provide the necessary information to add a new reservation. Make sure to fill in all required fields.')
+                                    ->icon('tabler-user')
+                                    ->columns(2)
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name')
+                                            ->label(trans('frontOffice.guest.nameLabel'))
+                                            ->required(),
+                                        Forms\Components\TextInput::make('identity_number')
+                                            ->required()
+                                            ->label(trans('frontOffice.guest.identityNumberLabel')),
+                                        Forms\Components\TextInput::make('email')
+                                            ->label(trans('frontOffice.guest.emailLabel'))
+                                            ->email(),
+                                        Forms\Components\TextInput::make('phone')
+                                            ->label(trans('frontOffice.guest.phoneLabel')),
+
+                                    ]),
+                            ])
+                            ->createOptionAction(
+                                fn(Forms\Components\Actions\Action $action) => $action
+                                    ->label('Create Guest')
+                                    ->modalHeading('Create Guest')
+                                    ->modalDescription('Please provide the necessary information to add a new guest.')
+                                    ->modalSubmitActionLabel('Add Guest')
+                                    ->modalIcon('tabler-user')
+                                    ->icon('tabler-user-plus')
+                                    ->color('primary')
+                                    ->modalWidth('3xl'),
+                            )
+                            ->createOptionForm([
+                                Forms\Components\Section::make()
+                                    ->columns(2)
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name')
+
+                                            ->label(trans('frontOffice.guest.nameLabel'))
+                                            ->prefixIcon('tabler-user')
+                                            ->prefixIconColor('primary')
+                                            ->required(),
+                                        Forms\Components\TextInput::make('identity_number')
+                                            ->prefixIcon('tabler-id-badge-2')
+                                            ->prefixIconColor('primary')
+                                            ->required()
+                                            ->label(trans('frontOffice.guest.identityNumberLabel')),
+                                        Forms\Components\TextInput::make('email')
+                                            ->prefixIcon('tabler-mail')
+                                            ->prefixIconColor('primary')
+                                            ->label(trans('frontOffice.guest.emailLabel'))
+                                            ->email(),
+                                        Forms\Components\TextInput::make('phone')
+                                            ->prefixIcon('tabler-phone')
+                                            ->prefixIconColor('primary')
+                                            ->label(trans('frontOffice.guest.phoneLabel')),
+                                        Forms\Components\RichEditor::make('address')
+                                            ->columnSpanFull()
+                                            ->label(trans('frontOffice.guest.addressLabel')),
+
+                                    ]),
+
+                            ])
+                            ->required(),
+                    ])->hiddenOn([CreateReservation::class, EditReservation::class]),
                 Forms\Components\Section::make('Reservation Schedule & Status')
                     ->description('This section provides a detailed view of the reservation schedule and status.')
                     ->icon('tabler-calendar-clock')
@@ -322,12 +404,16 @@ class ReservationResource extends Resource
                                     ->label('Calculate')
                                     ->color('primary')
                                     ->icon('tabler-calculator')
-                                    ->action(function (Set $set, Get $get) {
+                                    ->action(function (Set $set, Get $get, ManageReservations|CreateReservation $livewire) {
+                                        $room = null;
+                                        if ($livewire->record) {
+                                            $room = $livewire->getOwnerRecord();
+                                        }
                                         if ($get('room_id') !== null) {
                                             $room = Room::find($get('room_id'));
-                                            $totalNights = number_format(Carbon::parse($get('check_in'))->diffInDays(Carbon::parse($get('check_out'))), 0);
-                                            $set('total_price', $room->price * $totalNights);
                                         }
+                                        $totalNights = number_format(Carbon::parse($get('check_in'))->diffInDays(Carbon::parse($get('check_out'))), 0);
+                                        $set('total_price', $room ? $room->price * $totalNights : 0);
                                     }),
                             ),
                         Forms\Components\Select::make('status')
@@ -345,6 +431,7 @@ class ReservationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+
             ->columns([
                 Tables\Columns\TextColumn::make('index')
                     ->label(trans('frontOffice.room.indexLabel'))
@@ -495,6 +582,7 @@ class ReservationResource extends Resource
                         ->authorize(fn(Reservation $record): bool => auth()->user()->can('cancelReservation', $record)),
 
                     Tables\Actions\Action::make('extend')
+                        ->visible(fn(Reservation $record): bool => $record->guest_status === GuestStatus::CHECKIN->value)
                         ->icon('tabler-calendar-plus')
                         ->color('primary')
                         ->requiresConfirmation()
@@ -775,7 +863,6 @@ class ReservationResource extends Resource
                                 ->date()
                                 ->label(trans('frontOffice.reservation.checkOutLabel')),
                             Infolists\Components\TextEntry::make('estimate_arrival')
-
                                 ->weight(FontWeight::Bold)
                                 ->color('danger')
                                 ->icon('tabler-clock')

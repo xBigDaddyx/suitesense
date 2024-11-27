@@ -117,19 +117,19 @@ class LicenseResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('number')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('key')
                     ->label('Key'),
                 Tables\Columns\TextColumn::make('type')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->boolean(),
                 Tables\Columns\TextColumn::make('expires_at')
-                    ->dateTime()
+                    ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('subscription.plan.name'),
                 Tables\Columns\TextColumn::make('customer.full_name'),
-                Tables\Columns\TextColumn::make('number')
-                    ->searchable(),
+                Tables\Columns\IconColumn::make('is_active')
+                    ->boolean(),
 
             ])
             ->filters([

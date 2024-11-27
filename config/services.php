@@ -34,5 +34,10 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'xendit' => [
+        'secret_key' => env('XENDIT_SECRET_KEY'),
+        'public_key' => env('XENDIT_PUBLIC_KEY'),
+        'webhook_url' => env('XENDIT_WEBHOOK_URL'),
+    ],
 
 ];

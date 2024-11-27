@@ -1,4 +1,5 @@
 import preset from '../../../../vendor/filament/filament/tailwind.config.preset'
+const colors = require('tailwindcss/colors')
 
 export default {
     presets: [preset],
@@ -8,18 +9,19 @@ export default {
                 transparent: 'transparent',
                 current: 'currentColor',
                 primary:{
-                   '50': '#f7f6fc',
-        '100': '#efedfa',
-        '200': '#e1def6',
-        '300': '#cbc4ee',
-        '400': '#b0a2e3',
-        '500': '#947cd6',
-        '600': '#7e5bc6',
-        '700': '#714db4',
-        '800': '#5e4097',
-        '900': '#4e367c',
-        '950': '#312253',
-                }
+                    50: '#FFFFFF',
+  100: '#F8F5FE',
+  200: '#DFD0FB',
+  300: '#C7AAF7',
+  400: '#AE85F4',
+  500: '#955FF0',
+  600: '#7C3AED',
+  700: '#5D14DB',
+  800: '#470FA7',
+  900: '#320B74',
+  950: '#27085A'
+                 },
+
               },
         }
 

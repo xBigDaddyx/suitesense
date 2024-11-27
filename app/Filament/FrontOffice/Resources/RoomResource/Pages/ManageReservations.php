@@ -50,9 +50,11 @@ class ManageReservations extends ManageRelatedRecords
     public function table(Table $table): Table
     {
         return ReservationResource::table($table)
+            ->heading('Reservations')
+            ->description('provides a comprehensive overview of past interactions and reservations made by guests at our establishment.')
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                    ->modalWidth(MaxWidth::MaxContent),
+                    ->modalWidth(MaxWidth::SevenExtraLarge),
             ]);
         // return $table
         //     ->recordTitle(fn(Reservation $record): string => "{$record->guest->name} ({$record->status})")

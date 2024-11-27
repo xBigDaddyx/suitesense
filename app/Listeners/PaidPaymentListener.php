@@ -28,20 +28,36 @@ class PaidPaymentListener
         $exec = $record->save();
         switch ($exec) {
             case true:
+                //Broadcast Notification
                 Notifications\Notification::make()
                     ->title('Payment Successful! ✅')
                     ->success()
                     ->color('primary')
                     ->body('The payment has been processed successfully. Thank you!')
                     ->broadcast($event->user);
+                //Database Notification
+                Notifications\Notification::make()
+                    ->title('Payment Successful! ✅')
+                    ->success()
+                    ->color('primary')
+                    ->body('The payment has been processed successfully. Thank you!')
+                    ->sendToDatabase($event->user);
                 break;
             case false:
+                //Broadcast Notification
                 Notifications\Notification::make()
                     ->title('Payment Failed! ❌')
                     ->danger()
                     ->color('danger')
                     ->body('An error occurred during the payment process. Please try again or contact support.')
                     ->broadcast($event->user);
+                //Database Notification
+                Notifications\Notification::make()
+                    ->title('Payment Failed! ❌')
+                    ->danger()
+                    ->color('danger')
+                    ->body('An error occurred during the payment process. Please try again or contact support.')
+                    ->sendToDatabase($event->user);
                 break;
         }
     }

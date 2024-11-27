@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\RoomStatus;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -14,6 +15,7 @@ use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Vendor\Hotel;
 
 class Room extends Model implements HasMedia
 {
@@ -51,6 +53,25 @@ class Room extends Model implements HasMedia
             ->addMediaConversion('preview')
             ->fit(Fit::Contain, 600, 600)
             ->nonQueued();
+    }
+    public function scopeAvailableBetween($query, $checkIn, $checkOut, $roomTypeId)
+    {
+        return $query
+            // Filter by status
+            ->where('status', RoomStatus::AVAILABLE->value)
+
+            // Filter by room type if provided
+            ->when($roomTypeId, function ($q) use ($roomTypeId) {
+                $q->where('room_type_id', $roomTypeId);
+            })
+
+            // Exclude rooms with overlapping reservations
+            ->whereDoesntHave('reservations', function ($query) use ($checkIn, $checkOut) {
+                $query->where(function ($q) use ($checkIn, $checkOut) {
+                    $q->where('check_in', '<', $checkOut)
+                        ->where('check_out', '>', $checkIn);
+                });
+            });
     }
     public function getAvailableDates(string $startDate, string $endDate): array
     {

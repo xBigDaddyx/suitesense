@@ -22,6 +22,7 @@ return [
         'updatedAtLabel' => 'Updated At',
         'indexLabel' => 'No.',
         'nameLabel' => 'Room Name',
+        'statusLabel' => 'Room Status',
     ],
     'roomType' => [
         'label' => 'Room Types',
@@ -47,7 +48,7 @@ return [
         'label' => 'Reservations',
         'pluralLabel' => 'Reservations',
         'single' => 'Reservation',
-        'group' => 'Front Office',
+        'group' => 'Management',
         'title' => 'Reservations',
         'icon' => 'tabler-calendar-clock',
         'guestLabel' => 'Guest',

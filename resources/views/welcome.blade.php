@@ -34,24 +34,11 @@
                             <!-- start slider item -->
                             <div class="swiper-slide">
                                 <div class="position-absolute left-0px top-0px w-100 h-100 cover-background background-position-center-top"
-                                    style="background-image:url('{{ asset('images/illustration/suitify_illustration_photo_02.jpg') }}');">
+                                    style="background-image:url('{{ asset('images/illustration/suitify_illustration_3d_03.png') }}');">
                                 </div>
                             </div>
                             <!-- end slider item -->
-                            <!-- start slider item -->
-                            <div class="swiper-slide">
-                                <div class="position-absolute left-0px top-0px w-100 h-100 cover-background background-position-center-top"
-                                    style="background-image:url({{ asset('images/illustration/suitify_illustration_photo_01.jpg') }});">
-                                </div>
-                            </div>
-                            <!-- end slider item -->
-                            <!-- start slider item -->
-                            <div class="swiper-slide">
-                                <div class="position-absolute left-0px top-0px w-100 h-100 cover-background background-position-center-top"
-                                    style="background-image:url({{ asset('images/illustration/suitify_illustration_photo_03.jpg') }});">
-                                </div>
-                            </div>
-                            <!-- end slider item -->
+
                         </div>
                         <!-- start slider pagination -->
                         <div
@@ -263,7 +250,7 @@
                     <div class="container-fluid">
                         <div class="row align-items-center full-screen md-h-auto">
                             <div class="col-lg-6 cover-background overflow-visible h-100 md-h-500px"
-                                style="background-image: url('{{ asset('images/illustration/suitify_illustration_photo_04.jpg') }}');">
+                                style="background-image: url('{{ asset('images/illustration/suitify_illustration_3d_01.jpg') }}');">
                                 <div
                                     class="position-absolute right-minus-130px top-60px md-top-auto md-bottom-minus-50px fs-170 lg-fs-120 lg-right-minus-80px md-right-0px md-left-0px text-center text-lg-start alt-font z-index-9 fw-600 text-dark-gray opacity-3">
                                     01</div>
@@ -310,7 +297,7 @@
                     <div class="container-fluid">
                         <div class="row align-items-center full-screen md-h-auto">
                             <div class="col-lg-6 cover-background overflow-visible h-100 md-h-500px"
-                                style="background-image: url('{{ asset('images/illustration/suitify_illustration_photo_03.jpg') }}');">
+                                style="background-image: url('{{ asset('images/illustration/suitify_illustration_3d_02.jpg') }}');">
                                 <div
                                     class="position-absolute right-minus-130px top-60px md-top-auto md-bottom-minus-50px fs-170 lg-fs-120 lg-right-minus-80px md-right-0px md-left-0px text-center text-lg-start alt-font z-index-9 fw-600 text-dark-gray opacity-3">
                                     02</div>

@@ -4,7 +4,10 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Models\Vendor\Customer;
+use App\Models\Vendor\Hotel;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Collection;
@@ -12,17 +15,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Wildside\Userstamps\Userstamps;
 
-class User extends Authenticatable implements FilamentUser, HasTenants
+class User extends Authenticatable implements FilamentUser, HasTenants, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use Notifiable;
+    use HasFactory;
     use Userstamps;
     use HasRoles;
+    use SoftDeletes;
     public static function boot()
     {
         parent::boot();
@@ -90,5 +96,13 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     public function latestHotel(): BelongsTo
     {
         return $this->belongsTo(Hotel::class, 'hotel_id');
+    }
+    public function customer(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Customer::class, 'email', 'email');
+    }
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->avatar_url;
     }
 }

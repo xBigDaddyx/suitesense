@@ -2,6 +2,7 @@
 
 namespace App\Models\Vendor;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -56,11 +57,11 @@ class License extends Model
         // Generate a checksum by hashing the key and taking the first 4 characters of the hash
         return strtoupper(substr(sha1($key), 0, 4)); // 4 characters checksum
     }
-
-    public function customer(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function hotel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Hotel::class);
     }
+
     public function subscription(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Subscription::class);

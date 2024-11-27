@@ -1,4 +1,5 @@
 import preset from '../../../../vendor/filament/filament/tailwind.config.preset'
+const colors = require('tailwindcss/colors')
 
 export default {
     presets: [preset],
@@ -19,7 +20,12 @@ export default {
         '800': '#5e4097',
         '900': '#4e367c',
         '950': '#312253',
-                }
+                },
+                danger : colors.rose,
+                warning : colors.yellow,
+                success : colors.lime,
+                info : colors.blue,
+                gray : colors.zinc,
               },
         }
 
@@ -35,5 +41,5 @@ export default {
         './resources/views/filament/front-office/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
     ],
-    plugins: [require('preline/plugin')],
+    plugins: [require('preline/plugin'), require('@tailwindcss/forms'),require('@tailwindcss/typography')],
 }

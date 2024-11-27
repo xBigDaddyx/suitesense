@@ -13,6 +13,60 @@
     @apply bg-primary-100 dark:bg-gray-800;
 } */
 
+
+.card-pricing {
+    @apply mx-auto px-4 py-10 sm:px-6 lg:px-8 lg:py-14;
+  }
+.card-pricing-grid {
+    @apply grid;
+  }
+  .card-pricing-title {
+    @apply mx-auto mb-8 max-w-2xl text-center lg:mb-14;
+  }
+  .card-pricing-title h2 {
+    @apply text-3xl font-bold text-gray-800 dark:text-neutral-200 lg:text-4xl;
+  }
+  .card-pricing-body {
+    @apply relative xl:mx-auto xl:w-10/12;
+  }
+  .card-pricing-body-child {
+    @apply relative z-10 rounded-xl border bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900 md:p-10 shadow-md;
+  }
+  .card-pricing-body-child h3 {
+    @apply text-xl font-bold text-gray-800 dark:text-neutral-200;
+  }
+  .card-pricing-body-child-subtitle {
+    @apply text-sm text-gray-500 dark:text-neutral-500;
+  }
+  .card-pricing-price {
+    @apply mt-5;
+  }
+  .price {
+    @apply text-4xl font-bold text-gray-800 dark:text-neutral-200;
+  }
+  .decimal {
+    @apply text-lg font-bold text-gray-800 dark:text-neutral-200;
+  }
+  .period {
+    @apply ms-3 text-gray-500 dark:text-neutral-500;
+  }
+
+  .card-pricing-feature {
+    @apply mt-5 py-4 first:pt-0 last:pb-0 ;
+  }
+  .card-pricing-feature ul {
+    @apply space-y-2 text-sm sm:text-base w-full;
+  }
+  .card-pricing-feature li {
+    @apply flex ml-16 gap-x-3;
+  }
+  .card-pricing-feature-checklist {
+    @apply mt-0.5 size-5 flex justify-center items-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-800/30 dark:text-blue-500;
+  }
+  .card-pricing-feature-title {
+    @apply text-gray-800 dark:text-neutral-200;
+  }
+
 .fi-simple-main {
     background-image: url('/images/suitify_background_white.png');
     background-position: center;

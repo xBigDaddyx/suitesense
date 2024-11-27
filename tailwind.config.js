@@ -4,7 +4,7 @@ import defaultTheme from 'tailwindcss/defaultTheme';
 export default {
     darkMode: 'class',
     content: [
-        'node_modules/preline/dist/*.js',
+        './node_modules/preline/dist/*.js',
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './vendor/codewithdennis/filament-simple-alert/resources/**/*.blade.php',
         './storage/framework/views/*.php',
@@ -16,17 +16,17 @@ export default {
         extend: {
             colors: {
                 primary:{
-                    '50': '#f7f6fc',
-         '100': '#efedfa',
-         '200': '#e1def6',
-         '300': '#cbc4ee',
-         '400': '#b0a2e3',
-         '500': '#947cd6',
-         '600': '#7e5bc6',
-         '700': '#714db4',
-         '800': '#5e4097',
-         '900': '#4e367c',
-         '950': '#312253',
+                    50: '#EAE5F6',
+                    100: '#DED6F1',
+                    200: '#C5B8E6',
+                    300: '#AC9ADC',
+                    400: '#937BD1',
+                    500: '#7A5DC7',
+                    600: '#5C3DAF',
+                    700: '#462E86',
+                    800: '#30205C',
+                    900: '#1A1132',
+                    950: '#0F0A1D'
                  }
               },
             fontFamily: {
@@ -34,5 +34,5 @@ export default {
             },
         },
     },
-    plugins: [require('preline/plugin')],
+    plugins: [require('@tailwindcss/forms'),require('@tailwindcss/typography'),require('preline/plugin')],
 };

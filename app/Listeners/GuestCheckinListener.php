@@ -40,20 +40,36 @@ class GuestCheckinListener
         $record->room->status = RoomStatus::OCCUPIED->value;
         switch ($record->save()) {
             case true:
+                //Broadcast Notification
                 Notifications\Notification::make()
                     ->title('Check-In Successful! ✅')
                     ->success()
                     ->color('primary')
                     ->body('Guest check-in has been completed. Ready for the next steps!')
                     ->broadcast($event->user);
+                //Database Notification
+                Notifications\Notification::make()
+                    ->title('Check-In Successful! ✅')
+                    ->success()
+                    ->color('primary')
+                    ->body('Guest check-in has been completed. Ready for the next steps!')
+                    ->sendToDatabase($event->user);
                 break;
             case false:
+                //Broadcast Notification
                 Notifications\Notification::make()
                     ->title('Check-In Failed! ❌')
                     ->danger()
                     ->color('danger')
                     ->body('An error occurred during the check-in process. Please try again or contact support.')
                     ->broadcast($event->user);
+                //Database Notification
+                Notifications\Notification::make()
+                    ->title('Check-In Failed! ❌')
+                    ->danger()
+                    ->color('danger')
+                    ->body('An error occurred during the check-in process. Please try again or contact support.')
+                    ->sendToDatabase($event->user);
                 break;
         }
     }
