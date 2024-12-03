@@ -6,6 +6,8 @@ use App\Enums\ReservationStatus;
 use App\Filament\FrontOffice\Resources\ReservationResource;
 use App\Models\Reservation;
 use App\Models\Room;
+use App\States\Reservation\CheckedIn;
+use App\States\Reservation\Confirmed;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
 
 class ReservationCalendarWidget extends FullCalendarWidget
@@ -21,11 +23,12 @@ class ReservationCalendarWidget extends FullCalendarWidget
     public function fetchEvents(array $fetchInfo): array
     {
 
-        return Reservation::query()
+
+        return $datas = Reservation::query()
             ->where('room_id', $this->room->id)
-            ->where('check_in', '>=', $fetchInfo['start'])
-            ->where('check_out', '<=', $fetchInfo['end'])
-            ->where('status', ReservationStatus::CONFIRMED->value)
+            ->whereState('state', Confirmed::class)
+            ->orWhereState('state', CheckedIn::class)
+            ->where('room_id', $this->room->id)
             ->get()
             ->map(
                 fn(Reservation $event) => [

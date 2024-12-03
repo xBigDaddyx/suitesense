@@ -2,14 +2,14 @@
 
 namespace App\Policies;
 
-use App\Enums\PaymentStatus;
-use App\Enums\ReservationStatus;
-use App\Models\Payment;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use App\Models\Payment;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PaymentPolicy
 {
+    use HandlesAuthorization;
+
     /**
      * Determine whether the user can view any models.
      */
@@ -39,9 +39,6 @@ class PaymentPolicy
      */
     public function update(User $user, Payment $payment): bool
     {
-        if ($payment->status == PaymentStatus::COMPLETED->value || $payment->status == PaymentStatus::REFUNDED->value) {
-            return false;
-        }
         return $user->can('update_payment');
     }
 
@@ -54,7 +51,31 @@ class PaymentPolicy
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Determine whether the user can bulk delete.
+     */
+    public function deleteAny(User $user): bool
+    {
+        return $user->can('delete_any_payment');
+    }
+
+    /**
+     * Determine whether the user can permanently delete.
+     */
+    public function forceDelete(User $user, Payment $payment): bool
+    {
+        return $user->can('force_delete_payment');
+    }
+
+    /**
+     * Determine whether the user can permanently bulk delete.
+     */
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->can('force_delete_any_payment');
+    }
+
+    /**
+     * Determine whether the user can restore.
      */
     public function restore(User $user, Payment $payment): bool
     {
@@ -62,27 +83,26 @@ class PaymentPolicy
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Determine whether the user can bulk restore.
      */
-    public function forceDelete(User $user, Payment $payment): bool
+    public function restoreAny(User $user): bool
     {
-        return $user->can('force_delete_payment');
+        return $user->can('restore_any_payment');
     }
 
-    /** Determine whether the user can refund the payment */
-    public function refundPayment(User $user, Payment $payment): bool
+    /**
+     * Determine whether the user can replicate.
+     */
+    public function replicate(User $user, Payment $payment): bool
     {
-        if ($payment->status != PaymentStatus::COMPLETED->value && $payment->reservation->status == ReservationStatus::CANCELLED->value || $payment->status == PaymentStatus::REFUNDED->value) {
-            return false;
-        }
-        return $user->can('refund_payment');
+        return $user->can('replicate_payment');
     }
-    /** Determine whether the user can paid the payment */
-    public function paidPayment(User $user, Payment $payment): bool
+
+    /**
+     * Determine whether the user can reorder.
+     */
+    public function reorder(User $user): bool
     {
-        if ($payment->status == PaymentStatus::COMPLETED->value && $payment->reservation->status == ReservationStatus::CANCELLED->value || $payment->status == PaymentStatus::REFUNDED->value || $payment->status == PaymentStatus::COMPLETED->value) {
-            return false;
-        }
-        return $user->can('paid_payment');
+        return $user->can('reorder_payment');
     }
 }

@@ -15,7 +15,7 @@ class Room extends Widget
 
     public function getRooms()
     {
-        $status = $this->filters['status'];
+        $status = $this->filters['state'];
         $type = $this->filters['room_type'];
         $name = $this->filters['name'];
         $description = $this->filters['description'];
@@ -23,7 +23,7 @@ class Room extends Widget
         $this->rooms = RoomModel::query()->with('roomType')
 
             ->when($status, function ($query, $status) {
-                $query->where('status', $status);
+                $query->whereState('state', $status);
             })
             ->when($type, function ($query, $type) {
                 $query->where('room_type_id', $type);

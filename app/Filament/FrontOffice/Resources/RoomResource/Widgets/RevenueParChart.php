@@ -4,6 +4,8 @@ namespace App\Filament\FrontOffice\Resources\RoomResource\Widgets;
 
 use App\Models\Reservation;
 use App\Models\Room;
+use App\States\Reservation\CheckedIn;
+use App\States\Reservation\Confirmed;
 use Carbon\Carbon;
 use Filament\Support\RawJs;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
@@ -41,9 +43,9 @@ class RevenueParChart extends ApexChartWidget
             $endOfMonth = Carbon::create($year, $month)->endOfMonth();
 
             // Total pendapatan kamar dalam bulan ini
-            $totalRevenue = Reservation::whereIn('status', ['confirmed', 'completed'])
+            $totalRevenue = Reservation::whereState('state', Confirmed::class)->orWhereState('state', CheckedIn::class)
                 ->whereBetween('check_in', [$startOfMonth, $endOfMonth])
-                ->sum('total_price'); // Asumsi kolom `total_price` menyimpan pendapatan per reservasi
+                ->sum('price'); // Asumsi kolom `total_price` menyimpan pendapatan per reservasi
 
             // Total kamar tersedia selama bulan (jumlah kamar x jumlah hari dalam bulan)
             $daysInMonth = $startOfMonth->daysInMonth;

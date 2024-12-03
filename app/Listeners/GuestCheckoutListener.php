@@ -10,6 +10,10 @@ use Filament\Notifications;
 use App\Enums\GuestStatus;
 use App\Enums\ReservationStatus;
 use App\Enums\RoomStatus;
+use App\States\Guest\CheckedOut as GuestCheckedOut;
+use App\States\Reservation\CheckedOut;
+use App\States\Room\Cleaning;
+use Filament\Notifications\Actions\Action;
 
 class GuestCheckoutListener
 {
@@ -29,76 +33,60 @@ class GuestCheckoutListener
         $record = $event->record;
         $data = $event->data;
 
-        if ($record->is_completed_payment) {
-            $record->status = ReservationStatus::COMPLETED->value;
-            $record->checked_out_by = $event->user->id;
-            $record->guest_status = GuestStatus::CHECKOUT->value;
-            if ($data['guest_check_out_at'] === null) {
-                $record->guest_check_out_at = now();
-            } else {
-                $record->guest_check_out_at = $data['guest_check_out_at'];
-            }
-            $record->room->status = RoomStatus::AVAILABLE->value;
-            switch ($record->save()) {
-                case true:
-                    Notifications\Notification::make()
-                        ->title('Check-Out Successful! ✅')
-                        ->success()
-                        ->color('primary')
-                        ->body('Guest check-out is complete. Thank you for your service!')
-                        ->broadcast($event->user);
-                    Notifications\Notification::make()
-                        ->title('Check-Out Successful! ✅')
-                        ->success()
-                        ->color('primary')
-                        ->body('Guest check-out is complete. Thank you for your service!')
-                        ->sendToDatabase($event->user);
-                    break;
 
-                case false:
-                    Notifications\Notification::make()
-                        ->title('Check-Out Failed! ❌')
-                        ->danger()
-                        ->color('danger')
-                        ->body('An error occurred during the check-out process. Please try again or contact support.')
-                        ->broadcast($event->user);
-                    Notifications\Notification::make()
-                        ->title('Check-Out Failed! ❌')
-                        ->danger()
-                        ->color('danger')
-                        ->body('An error occurred during the check-out process. Please try again or contact support.')
-                        ->sendToDatabase($event->user);
-                    break;
-            }
-        } else {
-            Notifications\Notification::make()
-                ->title('Reservation payment is required')
-                ->seconds(20)
-                ->danger()
-                ->color('danger')
-                ->body('This pending payment on the reservation needs to be resolved.')
-                ->actions([
-                    Notifications\Actions\Action::make('view')
-                        ->label('View Payment')
-                        ->url(function () use ($record) {
-                            return route('filament.frontOffice.resources.reservations.managePayments', ['tenant' => Filament::getTenant(), 'record' => $record]);
-                        }, true)
-                        ->button(),
-                ])->broadcast($event->user);
-            Notifications\Notification::make()
-                ->title('Reservation payment is required')
-                ->seconds(20)
-                ->danger()
-                ->color('danger')
-                ->body('This pending payment on the reservation needs to be resolved.')
-                ->actions([
-                    Notifications\Actions\Action::make('view')
-                        ->label('View Payment')
-                        ->url(function () use ($record) {
-                            return route('filament.frontOffice.resources.reservations.managePayments', ['tenant' => Filament::getTenant(), 'record' => $record]);
-                        }, true)
-                        ->button(),
-                ])->sendToDatabase($event->user);
+        $record->state->transitionTo(CheckedOut::class);
+        $record->checked_out_by = $event->user->id;
+        $record->guest_status->transitionTo(GuestCheckedOut::class);
+        $record->guest_check_out_at = now();
+        $record->room->state->transitionTo(Cleaning::class);
+        switch ($record->save()) {
+            case true:
+                Notifications\Notification::make()
+                    ->title('Check-Out Successful! ✅')
+                    ->success()
+                    ->color('primary')
+                    ->body('Guest name ' . $record->guest->name . ' has been checked out successfully to room ' . $record->room->name . '.')
+                    ->actions([
+                        Action::make('view')
+                            ->label('View Reservation')
+                            ->icon('tabler-calendar-event')
+                            ->button()
+                            ->url(function () use ($record) {
+                                return route('filament.frontOffice.resources.rooms.manageReservations', ['tenant' => Filament::getTenant(), 'record' =>  $record->room]);
+                            }),
+                    ])
+                    ->broadcast($event->user);
+                Notifications\Notification::make()
+                    ->title('Check-Out Successful! ✅')
+                    ->success()
+                    ->color('primary')
+                    ->body('Guest name ' . $record->guest->name . ' has been checked out successfully to room ' . $record->room->name . '.')
+                    ->actions([
+                        Action::make('view')
+                            ->label('View Reservation')
+                            ->icon('tabler-calendar-event')
+                            ->button()
+                            ->url(function () use ($record) {
+                                return route('filament.frontOffice.resources.rooms.manageReservations', ['tenant' => Filament::getTenant(), 'record' =>  $record->room]);
+                            }),
+                    ])
+                    ->sendToDatabase($event->user);
+                break;
+
+            case false:
+                Notifications\Notification::make()
+                    ->title('Check-Out Failed! ❌')
+                    ->danger()
+                    ->color('danger')
+                    ->body('An error occurred during the check-out process. Please try again or contact support.')
+                    ->broadcast($event->user);
+                Notifications\Notification::make()
+                    ->title('Check-Out Failed! ❌')
+                    ->danger()
+                    ->color('danger')
+                    ->body('An error occurred during the check-out process. Please try again or contact support.')
+                    ->sendToDatabase($event->user);
+                break;
         }
     }
 }

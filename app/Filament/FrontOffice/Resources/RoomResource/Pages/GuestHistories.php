@@ -4,6 +4,9 @@ namespace App\Filament\FrontOffice\Resources\RoomResource\Pages;
 
 use App\Enums\Gender;
 use App\Filament\FrontOffice\Resources\RoomResource;
+use App\States\Reservation\CheckedIn;
+use App\States\Reservation\CheckedOut;
+use App\States\Reservation\Confirmed;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -101,7 +104,7 @@ class GuestHistories extends ManageRelatedRecords
                     ->searchable()
                     ->label(trans('frontOffice.user.checkOutLabel')),
             ])
-            ->modifyQueryUsing(fn(Builder $query): Builder => $query->where('status', 'completed'))
+            ->modifyQueryUsing(fn(Builder $query): Builder => $query->whereState('state', CheckedOut::class)->orWhereState('state', CheckedIn::class))
             ->filters([
                 //
             ])

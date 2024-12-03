@@ -3,6 +3,7 @@
 namespace App\Models\Vendor;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -54,4 +55,11 @@ class Subscription extends Model
     {
         return $this->is_active && $this->ends_at > now();
     }
+
+    /** @return BelongsTo<\App\Models\Vendor\Hotel, self> */
+    public function latestHotel(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Vendor\Hotel::class);
+    }
+
 }

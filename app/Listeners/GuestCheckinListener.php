@@ -6,9 +6,14 @@ use App\Enums\GuestStatus;
 use App\Enums\ReservationStatus;
 use App\Enums\RoomStatus;
 use App\Events\GuestCheckinEvent;
+use App\States\Guest\CheckedIn as GuestCheckedIn;
+use App\States\Reservation\CheckedIn;
+use App\States\Room\Occupied;
+use Filament\Facades\Filament;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Filament\Notifications;
+use Filament\Notifications\Actions\Action;
 
 class GuestCheckinListener
 {
@@ -27,17 +32,11 @@ class GuestCheckinListener
     {
         $record = $event->record;
         $data = $event->data;
-
-        $record->status = ReservationStatus::CONFIRMED->value;
-        $record->has_payment = true;
+        $record->state->transitionTo(CheckedIn::class);
         $record->checked_in_by = $event->user->id;
-        $record->guest_status = GuestStatus::CHECKIN->value;
-        if ($data['guest_check_in_at'] === null) {
-            $record->guest_check_in_at = now();
-        } else {
-            $record->guest_check_in_at = $data['guest_check_in_at'];
-        }
-        $record->room->status = RoomStatus::OCCUPIED->value;
+        $record->guest_status->transitionTo(GuestCheckedIn::class);
+        $record->guest_check_in_at = now();
+        $record->room->state->transitionTo(Occupied::class);
         switch ($record->save()) {
             case true:
                 //Broadcast Notification
@@ -45,14 +44,32 @@ class GuestCheckinListener
                     ->title('Check-In Successful! ✅')
                     ->success()
                     ->color('primary')
-                    ->body('Guest check-in has been completed. Ready for the next steps!')
+                    ->body('Guest name ' . $record->guest->name . ' has been checked in successfully to room ' . $record->room->name . '.')
+                    ->actions([
+                        Action::make('view')
+                            ->label('View Reservation')
+                            ->icon('tabler-calendar-event')
+                            ->button()
+                            ->url(function () use ($record) {
+                                return route('filament.frontOffice.resources.rooms.manageReservations', ['tenant' => Filament::getTenant(), 'record' =>  $record->room]);
+                            }),
+                    ])
                     ->broadcast($event->user);
                 //Database Notification
                 Notifications\Notification::make()
                     ->title('Check-In Successful! ✅')
                     ->success()
                     ->color('primary')
-                    ->body('Guest check-in has been completed. Ready for the next steps!')
+                    ->body('Guest name ' . $record->guest->name . ' has been checked in successfully to room ' . $record->room->name . '.')
+                    ->actions([
+                        Action::make('view')
+                            ->label('View Reservation')
+                            ->icon('tabler-calendar-event')
+                            ->button()
+                            ->url(function () use ($record) {
+                                return route('filament.frontOffice.resources.rooms.manageReservations', ['tenant' => Filament::getTenant(), 'record' =>  $record->room]);
+                            }),
+                    ])
                     ->sendToDatabase($event->user);
                 break;
             case false:

@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->uuid('hotel_id')->nullable();
+            $table->unsignedBigInteger('hotel_id')->nullable(); // Foreign key to users table
             $table->foreign('hotel_id')->references('id')->on('hotels')->onDelete('cascade');
         });
         Schema::create('hotel_user', function (Blueprint $table) {
             $table->id(); // Primary key for the pivot table
             $table->unsignedBigInteger('user_id'); // Foreign key to users table
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->uuid('hotel_id'); // Foreign key to hotels table
+            $table->unsignedBigInteger('hotel_id'); // Foreign key to users table
             $table->foreign('hotel_id')->references('id')->on('hotels')->onDelete('cascade');
             $table->string('department'); // Department of the user
             $table->string('job_title')->nullable(); // Job title of the user

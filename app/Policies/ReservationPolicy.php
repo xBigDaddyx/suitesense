@@ -2,14 +2,14 @@
 
 namespace App\Policies;
 
-use App\Enums\GuestStatus;
-use App\Enums\ReservationStatus;
-use App\Models\Reservation;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use App\Models\Reservation;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ReservationPolicy
 {
+    use HandlesAuthorization;
+
     /**
      * Determine whether the user can view any models.
      */
@@ -39,9 +39,6 @@ class ReservationPolicy
      */
     public function update(User $user, Reservation $reservation): bool
     {
-        if ($reservation->status == ReservationStatus::COMPLETED->value || $reservation->status == ReservationStatus::CANCELLED->value) {
-            return false;
-        }
         return $user->can('update_reservation');
     }
 
@@ -54,7 +51,31 @@ class ReservationPolicy
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Determine whether the user can bulk delete.
+     */
+    public function deleteAny(User $user): bool
+    {
+        return $user->can('delete_any_reservation');
+    }
+
+    /**
+     * Determine whether the user can permanently delete.
+     */
+    public function forceDelete(User $user, Reservation $reservation): bool
+    {
+        return $user->can('force_delete_reservation');
+    }
+
+    /**
+     * Determine whether the user can permanently bulk delete.
+     */
+    public function forceDeleteAny(User $user): bool
+    {
+        return $user->can('force_delete_any_reservation');
+    }
+
+    /**
+     * Determine whether the user can restore.
      */
     public function restore(User $user, Reservation $reservation): bool
     {
@@ -62,46 +83,26 @@ class ReservationPolicy
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Determine whether the user can bulk restore.
      */
-    public function forceDelete(User $user, Reservation $reservation): bool
+    public function restoreAny(User $user): bool
     {
-        return $user->can('force_delete_reservation');
+        return $user->can('restore_any_reservation');
     }
 
-    /** Determine whether the user can check in the reservation */
-    public function checkInReservation(User $user, Reservation $reservation): bool
+    /**
+     * Determine whether the user can replicate.
+     */
+    public function replicate(User $user, Reservation $reservation): bool
     {
-        if ($reservation->status == ReservationStatus::COMPLETED->value) {
-            return false;
-        }
-        return $user->can('check_in_reservation');
+        return $user->can('replicate_reservation');
     }
 
-    /** Determine whether the user can check out the reservation */
-    public function checkOutReservation(User $user, Reservation $reservation): bool
+    /**
+     * Determine whether the user can reorder.
+     */
+    public function reorder(User $user): bool
     {
-        if ($reservation->status == ReservationStatus::COMPLETED->value && $reservation->guest_status != GuestStatus::CHECKIN->value) {
-            return false;
-        }
-        return $user->can('check_out_reservation');
-    }
-
-    /** Determine whether the user can cancel the reservation */
-    public function cancelReservation(User $user, Reservation $reservation): bool
-    {
-        if ($reservation->status == ReservationStatus::COMPLETED->value && $reservation->guest_status != GuestStatus::CHECKIN->value || $reservation->status == ReservationStatus::CANCELLED->value) {
-            return false;
-        }
-        return $user->can('cancel_reservation');
-    }
-
-    /** Determine whether the user can extend the reservation */
-    public function extendReservation(User $user, Reservation $reservation): bool
-    {
-        if ($reservation->status == ReservationStatus::COMPLETED->value && $reservation->guest_status != GuestStatus::CHECKIN->value || $reservation->status == ReservationStatus::CANCELLED->value) {
-            return false;
-        }
-        return $user->can('extend_reservation');
+        return $user->can('reorder_reservation');
     }
 }

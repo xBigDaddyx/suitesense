@@ -7,8 +7,9 @@ use App\Filament\FrontOffice\Resources\ReservationResource\Widgets\OccupancyRate
 use App\Filament\FrontOffice\Resources\ReservationResource\Widgets\ReservationStats;
 use App\Filament\FrontOffice\Resources\RoomResource\Widgets\RoomsStat;
 use App\Filament\FrontOffice\Widgets\Room;
-
+use App\Models\Room as ModelsRoom;
 use App\Models\RoomType;
+use App\States\Room\Available;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Pages\Page;
 use Filament\Forms\Form;
@@ -20,6 +21,8 @@ class RoomsDashboard extends \Filament\Pages\Dashboard
     protected static ?string $navigationIcon = 'tabler-door';
     protected static string $routePath = 'rooms-status';
     protected static ?string $title = 'Room Status';
+
+
     public function getColumns(): int|string|array
     {
         return 12;
@@ -31,12 +34,10 @@ class RoomsDashboard extends \Filament\Pages\Dashboard
             ->schema([
                 Forms\Components\Section::make()
                     ->schema([
-                        Forms\Components\Select::make('status')
+                        Forms\Components\Select::make('state')
                             ->label(trans('frontOffice.room.statusLabel'))
-                            ->options(collect(RoomStatus::cases())->mapWithKeys(fn($status) => [
-                                $status->value => $status->label(),
-                            ])->toArray())
-                            ->default('available'),
+                            ->options(ModelsRoom::getStatesFor('state')->mapWithKeys(fn($state) => [$state => ucfirst($state)]))
+                            ->default(Available::class),
                         Forms\Components\Select::make('room_type')
                             ->label(trans('frontOffice.room.typeLabel'))
                             ->options(RoomType::all()->pluck('name', 'id')),

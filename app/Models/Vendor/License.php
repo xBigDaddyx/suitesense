@@ -3,6 +3,7 @@
 namespace App\Models\Vendor;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -70,4 +71,11 @@ class License extends Model
     {
         return $this->is_active && $this->subscription && $this->subscription->isActive();
     }
+
+    /** @return BelongsTo<\App\Models\Vendor\Hotel, self> */
+    public function latestHotel(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Vendor\Hotel::class);
+    }
+
 }

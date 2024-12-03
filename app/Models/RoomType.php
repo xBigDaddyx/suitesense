@@ -17,7 +17,17 @@ class RoomType extends Model
         'name',
         'description',
         'facilities',
+        'hotel_id'
     ];
+    public static function boot()
+    {
+        parent::boot();
+        self::creating(function ($model) {
+            if ($model->hotel_id == null) {
+                $model->hotel_id = auth()->user()->hotel_id;
+            }
+        });
+    }
     protected $casts = [
         'facilities' => 'array',
     ];

@@ -32,6 +32,7 @@ export default {
     },
 
     content: [
+        "./vendor/statikbe/laravel-filament-chained-translation-manager/**/*.blade.php",
         './node_modules/preline/dist/*.js',
         './vendor/awcodes/filament-table-repeater/resources/**/*.blade.php',
         './vendor/jaocero/radio-deck/resources/views/**/*.blade.php',

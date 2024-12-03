@@ -11,7 +11,27 @@
     <meta property="og:url" content="https://suitify.cloud">
     <meta property="og:type" content="website">
     <title>{{ $title ?? 'Page Title' }}</title>
+    <style>
+        @media print {
+            body {
+                background: white;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
 
+            .no-print {
+                display: none !important;
+            }
+
+            .print-border {
+                border: 1px solid #ddd;
+            }
+
+            .print-bg {
+                background-color: #f4f4f4 !important;
+            }
+        }
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 

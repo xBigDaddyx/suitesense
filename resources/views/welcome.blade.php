@@ -8,7 +8,7 @@
                     class="col-xl-5 col-lg-6 d-flex justify-content-center flex-column ps-10 xxl-ps-5 xl-ps-2 md-ps-0 position-relative order-2 order-lg-1">
                     <div
                         class="vertical-title-center align-items-center w-75px justify-content-center position-absolute h-auto d-none d-md-flex">
-                        <div class="title fs-16 alt-font text-dark-gray fw-700 text-uppercase ls-05px text-uppercase"
+                        <div class="title fs-16 alt-font text-base-color fw-700 text-uppercase ls-05px text-uppercase"
                             data-fancy-text='{ "opacity": [0, 1], "translateY": [50, 0], "filter": ["blur(20px)", "blur(0px)"], "string": ["Solusi Terintegrasi untuk Manajemen Perhotelan"], "duration": 400, "delay": 0, "speed": 50, "easing": "easeOutQuad" }'>
                         </div>
                     </div>
@@ -34,7 +34,7 @@
                             <!-- start slider item -->
                             <div class="swiper-slide">
                                 <div class="position-absolute left-0px top-0px w-100 h-100 cover-background background-position-center-top"
-                                    style="background-image:url('{{ asset('images/illustration/suitify_illustration_3d_03.png') }}');">
+                                    style="background-image:url('{{ asset('images/illustration/suitify_illustration_svg_06.png') }}');">
                                 </div>
                             </div>
                             <!-- end slider item -->
@@ -113,14 +113,14 @@
                         <div class="col-lg-7 col-md-7 sm-mb-30px text-end"
                             data-bottom-top="transform: translateY(-30px)"
                             data-top-bottom="transform: translateY(30px)">
-                            <img src="https://via.placeholder.com/261x313" alt=""
+                            <img src="{{ asset('images/illustration/suitify_illustration_svg_03.svg') }}" alt=""
                                 class="box-shadow-quadruple-large md-w-100" />
                         </div>
                         <div class="w-50 sm-w-100 overflow-hidden position-absolute sm-position-relative left-140px bottom-minus-200px sm-bottom-0px sm-left-0px p-0 sm-ps-15px sm-pe-15px"
                             data-shadow-animation="true" data-animation-delay="100"
                             data-bottom-top="transform: translateY(20px)"
                             data-top-bottom="transform: translateY(-20px)">
-                            <img src="https://via.placeholder.com/500x614" alt=""
+                            <img src="{{ asset('images/illustration/suitify_illustration_svg_04.svg') }}" alt=""
                                 class="box-shadow-quadruple-large w-100" />
                         </div>
                     </div>
@@ -250,7 +250,7 @@
                     <div class="container-fluid">
                         <div class="row align-items-center full-screen md-h-auto">
                             <div class="col-lg-6 cover-background overflow-visible h-100 md-h-500px"
-                                style="background-image: url('{{ asset('images/illustration/suitify_illustration_3d_01.jpg') }}');">
+                                style="background-image: url('{{ asset('images/illustration/suitify_illustration_svg_08.png') }}');">
                                 <div
                                     class="position-absolute right-minus-130px top-60px md-top-auto md-bottom-minus-50px fs-170 lg-fs-120 lg-right-minus-80px md-right-0px md-left-0px text-center text-lg-start alt-font z-index-9 fw-600 text-dark-gray opacity-3">
                                     01</div>
@@ -270,7 +270,7 @@
                                     <span
                                         class="text-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Pemesanan</span>
                                 </div>
-                                <h1 class="text-dark-gray alt-font fw-600 ls-minus-4px mb-25px">Sistem Pemesanan
+                                <h1 class="text-orange alt-font fw-600 ls-minus-4px mb-25px">Sistem Pemesanan
                                     Real-Time.
                                 </h1>
                                 <p class="w-95 md-w-100 mb-35px">Fitur pemesanan langsung memungkinkan tamu untuk
@@ -297,7 +297,7 @@
                     <div class="container-fluid">
                         <div class="row align-items-center full-screen md-h-auto">
                             <div class="col-lg-6 cover-background overflow-visible h-100 md-h-500px"
-                                style="background-image: url('{{ asset('images/illustration/suitify_illustration_3d_02.jpg') }}');">
+                                style="background-image: url('{{ asset('images/illustration/suitify_illustration_svg_09.png') }}');">
                                 <div
                                     class="position-absolute right-minus-130px top-60px md-top-auto md-bottom-minus-50px fs-170 lg-fs-120 lg-right-minus-80px md-right-0px md-left-0px text-center text-lg-start alt-font z-index-9 fw-600 text-dark-gray opacity-3">
                                     02</div>
@@ -318,7 +318,7 @@
                                         class="text-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Monitoring
                                         Ketersediaan Kamar</span>
                                 </div>
-                                <h1 class="text-dark-gray alt-font fw-600 ls-minus-4px mb-25px">Pemantauan Ketersediaan
+                                <h1 class="text-orange alt-font fw-600 ls-minus-4px mb-25px">Pemantauan Ketersediaan
                                     Kamar.
                                 </h1>
                                 <p class="w-95 md-w-100 mb-35px">Pantau ketersediaan kamar hotel Anda secara langsung.
@@ -344,7 +344,7 @@
                     <div class="container-fluid">
                         <div class="row align-items-center full-screen md-h-auto">
                             <div class="col-lg-6 cover-background overflow-visible h-100 md-h-500px"
-                                style="background-image: url('{{ asset('images/illustration/suitify_illustration_photo_02.jpg') }}');">
+                                style="background-image: url('{{ asset('images/illustration/suitify_illustration_svg_07.png') }}');">
                                 <div
                                     class="position-absolute right-minus-130px top-60px md-top-auto md-bottom-minus-50px fs-170 lg-fs-120 lg-right-minus-80px md-right-0px md-left-0px text-center text-lg-start alt-font z-index-9 fw-600 text-dark-gray opacity-3">
                                     03</div>
@@ -365,7 +365,7 @@
                                         class="text-base-color fs-15 alt-font fw-700 ls-05px text-uppercase d-inline-block align-middle">Analisis
                                         Data</span>
                                 </div>
-                                <h1 class="text-dark-gray alt-font fw-600 ls-minus-4px mb-25px">Laporan dan Analisis.
+                                <h1 class="text-orange alt-font fw-600 ls-minus-4px mb-25px">Laporan dan Analisis.
                                 </h1>
                                 <p class="w-95 md-w-100 mb-35px">Dapatkan wawasan yang mendalam dengan laporan yang
                                     terperinci. Suitify menyediakan analisis kinerja hotel, membantu Anda membuat
@@ -521,193 +521,7 @@
     </section> --}}
     <!-- end section -->
     <!-- start section -->
-    <section class="pb-0">
-        <div class="container-fluid p-0">
-            <div class="row row-cols-1 row-cols-lg-4 row-cols-sm-2 g-0"
-                data-anime='{ "el": "childs", "translateY": [30, 0], "rotateX":[30, 0], "opacity": [0,1], "duration": 600, "delay":0, "staggervalue": 300, "easing": "easeOutQuad" }'>
-                <!-- start team member item -->
-                <div class="col team-style-10 md-ps-15px md-pe-15px md-mb-30px">
-                    <figure class="mb-0 position-relative overflow-hidden">
-                        <img src="https://via.placeholder.com/480x605" class="w-100" alt="" />
-                        <img src="https://via.placeholder.com/480x605" class="hover-switch-image" alt="" />
-                        <figcaption class="w-100 h-100 d-flex flex-wrap">
-                            <div class="social-icon d-flex flex-column flex-shrink-1 mb-auto p-30px ms-auto">
-                                <a href="https://www.twitter.com/" target="_blank" class="text-white bg-dark-gray"><i
-                                        class="fa-brands fa-twitter icon-small"></i></a>
-                            </div>
-                            <div
-                                class="team-member-strip w-100 mt-auto d-flex align-items-center pt-15px pb-15px ps-30px pe-30px bg-white">
-                                <span
-                                    class="team-member-name fw-600 alt-font text-dark-gray fs-18 ls-minus-05px">Jeremy
-                                    dupont</span>
-                                <span class="member-designation fs-15 lh-20 ms-auto alt-font">Designer</span>
-                            </div>
-                        </figcaption>
-                    </figure>
-                </div>
-                <!-- end team member item -->
-                <!-- start team member item -->
-                <div class="col team-style-10 mt-20px md-mt-0 md-ps-15px md-pe-15px md-mb-30px">
-                    <figure class="mb-0 position-relative overflow-hidden">
-                        <img src="https://via.placeholder.com/480x605" class="w-100" alt="" />
-                        <img src="https://via.placeholder.com/480x605" class="hover-switch-image" alt="" />
-                        <figcaption class="w-100 h-100 d-flex flex-wrap">
-                            <div class="social-icon d-flex flex-column flex-shrink-1 mb-auto p-30px ms-auto">
-                                <a href="https://www.facebook.com/" target="_blank"
-                                    class="text-white bg-dark-gray"><i
-                                        class="fa-brands fa-facebook-f icon-small"></i></a>
-                            </div>
-                            <div
-                                class="team-member-strip w-100 mt-auto d-flex align-items-center pt-15px pb-15px ps-30px pe-30px bg-white">
-                                <span
-                                    class="team-member-name fw-600 alt-font text-dark-gray fs-18 ls-minus-05px">Matthew
-                                    taylor</span>
-                                <span class="member-designation fs-15 lh-20 ms-auto alt-font">Writer</span>
-                            </div>
-                        </figcaption>
-                    </figure>
-                </div>
-                <!-- end team member item -->
-                <!-- start team member item -->
-                <div class="col team-style-10 mt-40px md-mt-0 md-ps-15px md-pe-15px sm-mb-30px">
-                    <figure class="mb-0 position-relative overflow-hidden">
-                        <img src="https://via.placeholder.com/480x605" class="w-100" alt="" />
-                        <img src="https://via.placeholder.com/480x605" class="hover-switch-image" alt="" />
-                        <figcaption class="w-100 h-100 d-flex flex-wrap">
-                            <div class="social-icon d-flex flex-column flex-shrink-1 mb-auto p-30px ms-auto">
-                                <a href="https://www.linkedin.com/" target="_blank"
-                                    class="text-white bg-dark-gray"><i
-                                        class="fa-brands fa-linkedin-in icon-small"></i></a>
-                            </div>
-                            <div
-                                class="team-member-strip w-100 mt-auto d-flex align-items-center pt-15px pb-15px ps-30px pe-30px bg-white">
-                                <span
-                                    class="team-member-name fw-600 alt-font text-dark-gray fs-18 ls-minus-05px">Herman
-                                    miller</span>
-                                <span class="member-designation fs-15 lh-20 ms-auto alt-font">Manager</span>
-                            </div>
-                        </figcaption>
-                    </figure>
-                </div>
-                <!-- end team member item -->
-                <!-- start team member item -->
-                <div class="col team-style-10 mt-60px md-mt-0 md-ps-15px md-pe-15px">
-                    <figure class="mb-0 position-relative overflow-hidden">
-                        <img src="https://via.placeholder.com/480x605" class="w-100" alt="" />
-                        <img src="https://via.placeholder.com/480x605" class="hover-switch-image" alt="" />
-                        <figcaption class="w-100 h-100 d-flex flex-wrap">
-                            <div class="social-icon d-flex flex-column flex-shrink-1 mb-auto p-30px ms-auto">
-                                <a href="https://www.instagram.com/" target="_blank"
-                                    class="text-white bg-dark-gray"><i
-                                        class="fa-brands fa-instagram icon-small"></i></a>
-                            </div>
-                            <div
-                                class="team-member-strip w-100 mt-auto d-flex align-items-center pt-15px pb-15px ps-30px pe-30px bg-white">
-                                <span
-                                    class="team-member-name fw-600 alt-font text-dark-gray fs-18 ls-minus-05px">Jessica
-                                    dover</span>
-                                <span class="member-designation fs-15 lh-20 ms-auto alt-font">Designer</span>
-                            </div>
-                        </figcaption>
-                    </figure>
-                </div>
-                <!-- end team member item -->
-            </div>
-        </div>
-    </section>
-    <!-- end section -->
-    <!-- start section -->
-    <section class="big-section position-relative">
-        <div class="background-position-center-top background-no-repeat position-absolute h-100 w-100 left-0px top-0px"
-            style="background-image: url('https://via.placeholder.com/1126x630')"></div>
-        <div class="container position-relative">
-            <div class="row justify-content-center mb-8"
-                data-anime='{ "opacity": [0,1], "duration": 600, "delay":0, "staggervalue": 300, "easing": "easeOutQuad" }'>
-                <div class="col-xl-4 col-md-5">
-                    <h2 class="alt-font text-dark-gray mb-30px fw-600 ls-minus-3px">We are trusted by our clients<i
-                            class="bi bi-heart-fill d-inline-block align-top ms-10px animation-zoom icon-very-medium text-red"></i>
-                    </h2>
-                    <div class="d-flex md-mb-25px">
-                        <!-- start slider navigation -->
-                        <div
-                            class="slider-one-slide-prev-1 text-dark-gray swiper-button-prev slider-navigation-style-04 border border-1 border-color-extra-medium-gray bg-white">
-                            <i class="fa-solid fa-arrow-left"></i>
-                        </div>
-                        <div
-                            class="slider-one-slide-next-1 text-dark-gray swiper-button-next slider-navigation-style-04 border border-1 border-color-extra-medium-gray bg-white">
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </div>
-                        <!-- end slider navigation -->
-                    </div>
-                </div>
-                <div class="col-xl-6 col-md-7 overflow-hidden offset-xl-2">
-                    <div class="swiper"
-                        data-slider-options='{ "slidesPerView": 1, "spaceBetween": 40, "loop": true, "autoplay": { "delay": 8000, "disableOnInteraction": false }, "navigation": { "nextEl": ".slider-one-slide-next-1", "prevEl": ".slider-one-slide-prev-1" }, "keyboard": { "enabled": true, "onlyInViewport": true }, "breakpoints": { "992": { "slidesPerView": 1 }, "768": { "slidesPerView":1 }, "320": { "slidesPerView": 1 } }, "effect": "slide" }'>
-                        <div class="swiper-wrapper">
-                            <!-- start review item -->
-                            <div class="swiper-slide">
-                                <h5 class="text-dark-gray mb-15px w-95 xl-w-100 lh-40 ls-minus-1px alt-font">The <span
-                                        class="text-decoration-line-bottom-medium fw-700">wonderful</span> services you
-                                    offer locally are great for our community. People are tired of having to travel out
-                                    of town for things.</h5>
-                                <span class="text-base-color fw-700 text-uppercase ls-1px">@Herman
-                                    miller</span>
-                            </div>
-                            <!-- end review item -->
-                            <!-- start review item -->
-                            <div class="swiper-slide">
-                                <h5 class="text-dark-gray mb-15px w-95 xl-w-100 lh-40 ls-minus-1px alt-font">Absolutely
-                                    amazing theme and <span
-                                        class="text-decoration-line-bottom-medium fw-700">awesome</span> design with
-                                    possibilities. It's so very easy to use and to customize everything.</h5>
-                                <span class="text-base-color fw-700 text-uppercase ls-1px">@Alexander
-                                    Harad</span>
-                            </div>
-                            <!-- end review item -->
-                            <!-- start review item -->
-                            <div class="swiper-slide">
-                                <h5 class="text-dark-gray mb-15px w-95 xl-w-100 lh-40 ls-minus-1px alt-font">There are
-                                    design companies and then there are user <span
-                                        class="text-decoration-line-bottom-medium fw-700">experience.</span> Simply the
-                                    great designs and best theme for fast loading website.</h5>
-                                <span class="text-base-color fw-700 text-uppercase ls-1px">@Jacob
-                                    Kalling</span>
-                            </div>
-                            <!-- end review item -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row row-cols-1 row-cols-lg-5 row-cols-md-3 row-cols-sm-2 clients-style-06 justify-content-center"
-                data-anime='{ "el": "childs", "translateY": [30, 0], "opacity": [0,1], "skewX":[20, 0], "duration": 300, "delay":0, "staggervalue": 200, "easing": "easeOutQuad" }'>
-                {{-- <!-- start client item -->
-                <div class="col client-box text-center md-mb-35px">
-                    <a href="#"><img src="images/logo-walmart.svg" class="h-35px" alt=""></a>
-                </div>
-                <!-- end client item -->
-                <!-- start client item -->
-                <div class="col client-box text-center md-mb-35px">
-                    <a href="#"><img src="images/logo-logitech.svg" class="h-35px" alt=""></a>
-                </div>
-                <!-- end client item -->
-                <!-- start client item -->
-                <div class="col client-box text-center md-mb-35px">
-                    <a href="#"><img src="images/logo-monday.svg" class="h-35px" alt=""></a>
-                </div>
-                <!-- end client item -->
-                <!-- start client item -->
-                <div class="col client-box text-center sm-mb-35px">
-                    <a href="#"><img src="images/logo-google.svg" class="h-35px" alt=""></a>
-                </div>
-                <!-- end client item -->
-                <!-- start client item -->
-                <div class="col client-box text-center">
-                    <a href="#"><img src="images/logo-paypal.svg" class="h-35px" alt=""></a>
-                </div>
-                <!-- end client item --> --}}
-            </div>
-        </div>
-    </section>
+
     <!-- end section -->
     <!-- start footer -->
     <footer class="bg-charcoal-blue pb-4 sm-pb-50px"

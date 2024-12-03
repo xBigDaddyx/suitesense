@@ -10,7 +10,7 @@
         --color-primary-dark: #5f14e0;
         --color-primary-light: #9b69f1;
 
-        --color-secondary: #ed3a51;
+        --color-secondary: #F09001;
         --color-secondary-content: #ffffff;
         --color-secondary-dark: #e0142f;
         --color-secondary-light: #f1697a;
@@ -70,7 +70,7 @@
 }
 
 .fi-modal-window{
-    @apply bg-primary-100 ;
+    @apply bg-primary-100;
 }
 .fi-breadcrumbs-item-label {
     @apply text-primary-400;
@@ -91,6 +91,7 @@
     @apply text-white dark:text-white;
 }
 .fi-section-header {
+
     @apply bg-primary-500 dark:bg-primary-800 rounded-t-xl;
 }
 /* width */
@@ -132,14 +133,16 @@
     background-size: cover;
 } */
 
+.fi-btn , .fi-input{
+    @apply transition-all duration-300 ease-in-out;
+}
 
-
-/* .fi-layout {
-    background-image: url('/storage/images/dolphin_directory_bg_01.png');
+.fi-simple-layout {
+    background-image: url('http://127.0.0.1:8000/images/background/suitify_background_02.jpg');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-} */
+}
 
 .fi-simple-main {
     @apply shadow-md;

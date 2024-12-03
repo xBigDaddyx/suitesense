@@ -39,7 +39,7 @@ class TotalRevenueChart extends ApexChartWidget
             ->selectRaw('
                 EXTRACT(MONTH FROM check_in) AS month,
                 EXTRACT(YEAR FROM check_in) AS year,
-                SUM(total_price) AS total_revenue
+                SUM(price) AS total_revenue
             ')
             ->whereBetween('check_in', [$startDate, $endDate])
             ->groupBy(DB::raw('EXTRACT(YEAR FROM check_in), EXTRACT(MONTH FROM check_in)'))

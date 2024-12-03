@@ -1,62 +1,46 @@
 @php
     $record = $getRecord();
 @endphp
-
-<div class="w-[420px] rounded-lg bg-white p-6 shadow-md border ">
-    <div class="flex items-center border-b">
-        @svg('tabler-door', 'w-6 h-6 text-primary-500')
-        <div class="p-4">
-            <h3 class="text-md font-semibold text-gray-900 text-primary-500">{{ $record->room->name }}</h3>
-            <p class="text-base font-medium text-gray-800">{{ $record->room->roomType->name }}</p>
-        </div>
+<div class="mx-auto max-w-fit overflow-hidden rounded-xl bg-white shadow-xl">
+    <!-- Header with Gradient Background -->
+    <div class="w-full bg-primary-500 p-8 text-center">
+        <h3 class="text-3xl font-extrabold text-white">Reservation Details</h3>
+        <p class="mt-2 text-sm text-white">Reservation # <span
+                class="font-semibold text-white">{{ $record->number }}</span></p>
     </div>
 
-    <div class="mt-6 flex justify-between px-4 text-center ">
-        <div>
-            <p class="text-xl font-semibold text-gray-900">
-                {{ trans('frontOffice.room.priceCurrency') . ' ' . number_format($record->room->price, 2) }}</p>
-            <p class="text-sm text-gray-500">Per night</p>
-        </div>
-        <div>
-            <p class="text-xl font-semibold text-gray-900">
-                {{ $record->room->status }}</p>
-            <p class="text-sm text-gray-500">Status</p>
-        </div>
-        <div>
-            <p class="text-xl font-semibold text-gray-900">{{ $record->total_nights }}</p>
-            <p class="text-sm text-gray-500">Total Night</p>
-        </div>
-    </div>
+    <!-- Card Body -->
+    <div class="space-y-6 p-6">
 
-    <div class="mt-6 space-y-3">
-        <div class="flex justify-between">
-            <p class="text-sm text-gray-500">Reservation Number</p>
-            <x-filament::badge size="sm">
-                {{ $record->number }}
-            </x-filament::badge>
+        <!-- Guest Info Section -->
+        <div class="space-y-4">
+            <h4 class="text-xl font-semibold text-gray-800">Guest Information</h4>
+            <div class="flex items-center space-x-4">
 
+                <div>
+                    <p class="text-lg font-semibold text-gray-800">{{ $record->guest->name }}</p>
+                    <p class="text-sm text-gray-600">Identity Number: {{ $record->guest->identity_number }}</p>
+                    <p class="text-sm text-gray-600">Phone: {{ $record->guest->phone }}</p>
+                    <p class="text-sm text-gray-600">Email: {{ $record->guest->email }}</p>
+                </div>
+            </div>
         </div>
 
-        <div class="flex justify-between">
-            <p class="text-sm text-gray-500">Guest Name</p>
-            <p class="text-sm font-medium text-gray-900">{{ $record->guest->name ?? '-' }}</p>
-        </div>
-        <div class="flex justify-between">
-            <p class="text-sm text-gray-500">Guest Identity ID</p>
-            <p class="text-sm font-medium text-gray-900">{{ $record->guest->identity_number ?? '-' }}</p>
-        </div>
-        <div class="flex justify-between">
-            <p class="text-sm text-gray-500">Guest Phone</p>
-            <p class="text-sm font-medium text-gray-900">{{ $record->guest->phone ?? '-' }}</p>
-        </div>
-    </div>
-
-    <div class="mt-6 border-t pt-3">
-        <div class="flex justify-between">
-            <p class="text-sm text-gray-500">Total Price</p>
-            <p class="text-sm font-medium text-gray-900">
-                {{ trans('frontOffice.reservation.priceCurrency') . ' ' . number_format($record->total_price, 2) }}
-            </p>
+        <!-- Room and Date Info Section -->
+        <div class="space-y-4">
+            <h4 class="text-xl font-semibold text-gray-800">{{ $record->room->roomType->name }}</h4>
+            <div class="space-y-2">
+                <p class="text-base text-gray-600">Room: <span class="font-semibold">{{ $record->room->name }}</span>
+                </p>
+                <p class="text-base text-gray-600">Check-In: <span
+                        class="font-semibold">{{ \Carbon\Carbon::parse($record->check_in)->format('M j, Y') }}</span>
+                </p>
+                <p class="text-base text-gray-600">Checkout Date: <span
+                        class="font-semibold">{{ \Carbon\Carbon::parse($record->check_out)->format('M j, Y') }}</span>
+                </p>
+                <p class="text-base text-gray-600">Duration: <span class="font-semibold">{{ $record->total_nights }}
+                        Nights</span></p>
+            </div>
         </div>
     </div>
 </div>

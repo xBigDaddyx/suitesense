@@ -5,6 +5,11 @@ namespace App\Filament\FrontOffice\Resources\ReservationResource\Pages;
 use App\Enums\ReservationStatus;
 use App\Filament\FrontOffice\Resources\ReservationResource;
 use App\Models\Reservation;
+use App\States\Reservation\Cancelled;
+use App\States\Reservation\CheckedIn;
+use App\States\Reservation\CheckedOut;
+use App\States\Reservation\Confirmed;
+use App\States\Reservation\Pending;
 use Filament\Actions;
 use Filament\Pages\Concerns\ExposesTableToWidgets;
 use Filament\Resources\Pages\ListRecords;
@@ -27,34 +32,40 @@ class ListReservations extends ListRecords
         return [
             'all' => Tab::make('All reservations'),
             'pending' => Tab::make('Pending')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('reservations.status', ReservationStatus::PENDING->value))
-                ->icon(ReservationStatus::PENDING->icon())
-                ->badge(Reservation::query()->where('reservations.status', ReservationStatus::PENDING->value)->count())
-                ->badgeColor('danger'),
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereState('reservations.state', Pending::class))
+                // ->icon()
+                ->badge(Reservation::query()->whereState('reservations.state', Pending::class)->count())
+                ->badgeColor('primary'),
             'confirmed' => Tab::make('Confirmed')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('reservations.status', ReservationStatus::CONFIRMED->value))
-                ->icon(ReservationStatus::CONFIRMED->icon())
-                ->badge(Reservation::query()->where('reservations.status', ReservationStatus::CONFIRMED->value)->count())
-                ->badgeColor('info'),
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereState('reservations.state', Confirmed::class))
+                // ->icon()
+                ->badge(Reservation::query()->whereState('reservations.state', Confirmed::class)->count())
+                ->badgeColor('primary'),
             'cancelled' => Tab::make('Cancelled')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('reservations.status', ReservationStatus::CANCELLED->value))
-                ->icon(ReservationStatus::CANCELLED->icon())
-                ->badge(Reservation::query()->where('reservations.status', ReservationStatus::CANCELLED->value)->count())
-                ->badgeColor('warning'),
-            'completed' => Tab::make('Completed')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('reservations.status', ReservationStatus::COMPLETED->value))
-                ->icon(ReservationStatus::COMPLETED->icon())
-                ->badge(Reservation::query()->where('reservations.status', ReservationStatus::COMPLETED->value)->count())
-                ->badgeColor('success'),
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereState('reservations.state', Cancelled::class))
+                // ->icon()
+                ->badge(Reservation::query()->whereState('reservations.state', Cancelled::class)->count())
+                ->badgeColor('primary'),
+            'checkedIn' => Tab::make('Checked In')
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereState('reservations.state', CheckedIn::class))
+                // ->icon()
+                ->badge(Reservation::query()->whereState('reservations.state', CheckedIn::class)->count())
+                ->badgeColor('primary'),
+            'checkedOut' => Tab::make('Checked out')
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereState('reservations.state', CheckedOut::class))
+                // ->icon()
+                ->badge(Reservation::query()->whereState('reservations.state', CheckedOut::class)->count())
+                ->badgeColor('primary'),
+
 
         ];
     }
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()
-                ->authorize(fn(): bool => auth()->user()->can('create_reservation'))
-                ->icon('tabler-plus'),
+            // Actions\CreateAction::make()
+            //     ->authorize(fn(): bool => auth()->user()->can('create_reservation'))
+            //     ->icon('tabler-plus'),
         ];
     }
 }

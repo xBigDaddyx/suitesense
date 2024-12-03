@@ -13,17 +13,12 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->timestamp('due_date')->nullable();
-            $table->timestamp('invoice_date');
-            $table->json('customer_details');
-            $table->string('payment_type')->default('virtual_account');
-            $table->json('item_details');
-            $table->json('amount');
-            $table->text('notes')->nullable();
-            $table->json('virtual_accounts')->nullable();
-            $table->enum('status', ['draft', 'sent', 'paid', 'expired'])->default('draft');
-            $table->uuid('order_id')->nullable();
-            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
+            $table->uuid('reservation_id');
+            $table->foreign('reservation_id')->references('id')->on('reservations')->onDelete('cascade');
+            $table->decimal('total_amount', 10, 2);
+            $table->decimal('paid_amount', 10, 2)->default(0);
+            $table->decimal('outstanding_amount', 10, 2);
+            $table->string('state');
             $table->string('number')->unique();
             $table->string('number_series');
             $table->integer('number_invoice')->nullable();

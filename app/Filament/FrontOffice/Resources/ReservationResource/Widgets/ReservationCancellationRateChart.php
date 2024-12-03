@@ -2,6 +2,7 @@
 
 namespace App\Filament\FrontOffice\Resources\ReservationResource\Widgets;
 
+use App\States\Reservation\Confirmed;
 use Carbon\Carbon;
 use Filament\Support\RawJs;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
@@ -39,9 +40,9 @@ class ReservationCancellationRateChart extends ApexChartWidget
             ->select(
                 DB::raw('DATE_TRUNC(\'month\', check_in) as month'),
                 DB::raw('count(*) as total_reservations'),
-                DB::raw('sum(CASE WHEN status = \'cancelled\' THEN 1 ELSE 0 END) as cancelled_reservations')
+                DB::raw('sum(CASE WHEN state = \'cancelled\' THEN 1 ELSE 0 END) as cancelled_reservations')
             )
-            ->where('status', '!=', 'completed')
+            ->whereState('state', '!=', Confirmed::class)
             ->whereBetween('check_in', [$startDate, $endDate])
 
             ->groupBy(DB::raw('DATE_TRUNC(\'month\', check_in)'))

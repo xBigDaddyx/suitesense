@@ -38,7 +38,7 @@ class AdrChart extends ApexChartWidget
             ->selectRaw('
                 EXTRACT(MONTH FROM check_in) AS month,
                 EXTRACT(YEAR FROM check_in) AS year,
-                SUM(total_price) AS total_revenue,
+                SUM(price) AS total_revenue,
                 COUNT(*) AS total_bookings
             ')
             ->whereBetween('check_in', [$startDate, $endDate])

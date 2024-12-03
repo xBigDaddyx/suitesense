@@ -6,15 +6,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 /* variable */
 :root {
-    --base-color: #CFAEFF;
+    --base-color: #7c3aed;
+    --secondary : #F09001;
     --medium-gray: #7b7a7a;
     --dark-gray: #1d1d1d;
     --charcoal-blue: #232323;
     --alt-font: 'Space Grotesk', sans-serif;
     --primary-font: 'Inter', sans-serif;
+    --color-primary-light: #F8F5FE;
+}
+.text-secondary {
+    color: var(--secondary);
 }
 body {
     line-height: 30px;
+    background-color: var(--color-primary-light);
 }
 a:hover {
     color: var(--dark-gray);

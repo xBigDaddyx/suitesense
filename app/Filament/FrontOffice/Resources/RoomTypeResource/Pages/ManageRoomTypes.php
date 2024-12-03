@@ -15,8 +15,7 @@ class ManageRoomTypes extends ManageRecords
         return [
             Actions\CreateAction::make()
                 ->icon('tabler-plus')
-                ->label(trans('frontOffice.roomType.createLabel'))
-                ->authorize(fn(RoomTypeResource $resource): bool => auth()->user()->can('create_room_type')),
+                ->label(trans('frontOffice.roomType.createLabel')),
         ];
     }
 }

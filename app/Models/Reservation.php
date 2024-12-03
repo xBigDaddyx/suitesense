@@ -6,6 +6,8 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
 use App\Enums\ReservationStatus;
+use App\ModelStates\GuestState;
+use App\ModelStates\ReservationState;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -14,29 +16,34 @@ use Wildside\Userstamps\Userstamps;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Ramsey\Uuid\Type\Decimal;
+use Spatie\ModelStates\HasStates;
 
 class Reservation extends Model
 {
+    use HasStates;
     use HasUuids;
     use SoftDeletes;
     use Userstamps;
     use HasFactory;
+
     protected static function booted(): void
     {
         parent::booted();
         self::creating(static function ($model) {
-            if ($model->status === null) {
-                $model->status = ReservationStatus::PENDING->value;
-            }
-
             // Calculate the next number number in the series
             $model->number_series = 'SS-RV-' . Carbon::now()->format('m') . '-' . Carbon::now()->format('Y');
             $model->number_reservation = (Reservation::where('number_series', $model->number_series)->max('number_reservation') ?? 0) + 1;
             // Compose the full number
             $model->number = $model->number_series . '-' . $model->number_reservation;
+            $model->hotel_id = auth()->user()->latestHotel->id;
         });
     }
     protected $fillable = [
+        'total_amount',
+        'price',
+        'paid_amount',
+        'notes',
+        'state',
         'reason',
         'cancelled_by',
         'cancelled_at',
@@ -48,17 +55,14 @@ class Reservation extends Model
         'checked_in_by',
         'checked_out_by',
         'reservation_source',
-        'has_payment',
         'estimate_arrival',
         'room_id',
         'guest_id',
         'check_in',
         'check_out',
-        'status',
         'number',
         'number_series',
         'number_reservation',
-        'is_completed_payment',
         'is_extended',
     ];
     protected $casts = [
@@ -66,6 +70,8 @@ class Reservation extends Model
         'estimate_arrival' => 'datetime',
         'is_completed_payment' => 'boolean',
         'is_extended' => 'boolean',
+        'state' => ReservationState::class,
+        'guest_status' => GuestState::class,
 
     ];
     public function getTotalNightsAttribute()
@@ -117,10 +123,12 @@ class Reservation extends Model
 
         return $payment;
     }
-    public function scopePending(Builder $query): Builder
+    public function getTotalPaidAttribute(): float
     {
-        return $query->where('status', 'pending');
+        return $this->payments()->sum('paid_amount');
     }
+
+
     public function room(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Room::class);
@@ -132,5 +140,22 @@ class Reservation extends Model
     public function payments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+    public function invoices(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+    public function additionalFacilities(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ReservationFacility::class);
+    }
+    public function getFacilityTotalAttribute(): float
+    {
+        return $this->additionalFacilities->sum('total_price');
+    }
+
+    public function getTotalPriceAttribute(): float
+    {
+        return $this->price + $this->facility_total;
     }
 }

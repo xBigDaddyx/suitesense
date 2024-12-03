@@ -6,6 +6,7 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
 use App\Filament\FrontOffice\Resources\PaymentResource;
+use App\Filament\FrontOffice\Resources\PaymentResource\Pages\CreatePayment;
 use App\Filament\FrontOffice\Resources\ReservationResource;
 use App\Models\Payment;
 use App\Models\Reservation;

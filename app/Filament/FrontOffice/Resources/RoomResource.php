@@ -107,65 +107,65 @@ class RoomResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Room Details')
-                    ->description('Please provide the necessary information to add a new room. Make sure to fill in all required fields.')
-                    ->icon('tabler-door') // Custom icon for better visual appeal
-                    ->columns(2)
+                Forms\Components\Grid::make(2)
                     ->schema([
-                        // Forms\Components\Select::make('hotel_id')
-                        //     ->relationship('hotel', 'name')
-                        //     ->required()
-                        //     ->placeholder('Select a hotel') // Placeholder for better UX
-                        //     ->searchable() // Allow searching through hotels
-                        //     ->reactive() // React to changes for dynamic updates
-                        //     ->label('Hotel') // Custom label for clarity
-                        //     ->helperText('Please select the hotel where this room is located.'), // Helper text for guidance
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->maxLength(255)
-                            ->placeholder('Enter room name (e.g., Room 01, Room 02)') // Placeholder for better UX
-                            ->label('Room Name') // Custom label for clarity
-                            ->helperText('Specify the name of room being added.'), // Helper text for guidance
+                        Forms\Components\Group::make([
+                            Forms\Components\Section::make('Room Details')
+                                ->description('Please provide the necessary information to add a new room. Make sure to fill in all required fields.')
+                                ->icon('tabler-door') // Custom icon for better visual appeal
+                                ->columns(2)
+                                ->schema([
+                                    // Forms\Components\Select::make('hotel_id')
+                                    //     ->relationship('hotel', 'name')
+                                    //     ->required()
+                                    //     ->placeholder('Select a hotel') // Placeholder for better UX
+                                    //     ->searchable() // Allow searching through hotels
+                                    //     ->reactive() // React to changes for dynamic updates
+                                    //     ->label('Hotel') // Custom label for clarity
+                                    //     ->helperText('Please select the hotel where this room is located.'), // Helper text for guidance
+                                    Forms\Components\TextInput::make('name')
+                                        ->required()
+                                        ->maxLength(255)
+                                        ->placeholder('Enter room name (e.g., Room 01, Room 02)') // Placeholder for better UX
+                                        ->label('Room Name') // Custom label for clarity
+                                        ->helperText('Specify the name of room being added.'), // Helper text for guidance
 
-                        Forms\Components\Select::make('room_type_id')
-                            ->relationship('roomType', 'name')
-                            ->required()
-                            ->placeholder('Enter room type (e.g., Deluxe, Suite)') // Placeholder for better UX
-                            ->label('Room Type') // Custom label for clarity
-                            ->helperText('Specify the type of room being added.'), // Helper text for guidance
+                                    Forms\Components\Select::make('room_type_id')
+                                        ->relationship('roomType', 'name')
+                                        ->required()
+                                        ->placeholder('Enter room type (e.g., Deluxe, Suite)') // Placeholder for better UX
+                                        ->label('Room Type') // Custom label for clarity
+                                        ->helperText('Specify the type of room being added.'), // Helper text for guidance
 
-                        Forms\Components\TextInput::make('price')
-                            ->required()
-                            ->numeric()
-                            ->prefix(trans('frontOffice.room.pricePrefix'))
-                            ->placeholder('Enter price (in USD)') // Placeholder for better UX
-                            ->minValue(0) // Ensure price cannot be negative
-                            ->label('Room Price') // Custom label for clarity
-                            ->helperText('Enter the room price per night. Use numbers only.'), // Helper text for guidance
+                                    Forms\Components\TextInput::make('price')
+                                        ->required()
+                                        ->numeric()
+                                        ->prefix(trans('frontOffice.room.pricePrefix'))
+                                        ->placeholder('Enter price (in USD)') // Placeholder for better UX
+                                        ->minValue(0) // Ensure price cannot be negative
+                                        ->label('Room Price') // Custom label for clarity
+                                        ->helperText('Enter the room price per night. Use numbers only.'), // Helper text for guidance
+                                ]),
+                        ]),
+                        Forms\Components\Group::make([
+                            Forms\Components\Section::make('Room Photos')
+                                ->description('Please upload the room photos. This will be displayed on the room listing page.')
+                                ->icon('tabler-photo')
+                                ->columns(2)
+                                ->schema([
+                                    \Filament\Forms\Components\SpatieMediaLibraryFileUpload::make('image')
+                                        ->columnSpanFull()
+                                        ->panelLayout('grid')
+                                        ->moveFiles()
+                                        ->collection('room-photos')
+                                        ->label('Room Photos') // Custom label for clarity
+                                        ->helperText('Upload an image for the room.'), // Helper text for guidance
+                                ]),
+                        ]),
 
-                        Forms\Components\Toggle::make('is_available')
-                            ->columnSpanFull()
-                            ->onIcon('tabler-check')
-                            ->offIcon('tabler-x')
-                            ->onColor('success')
-                            ->offColor('danger')
-                            ->required()
-                            ->label('Available') // Custom label for clarity
-                            ->inline() // Display toggle inline for a cleaner look
-                            ->default(true) // Default value for availability
-                            ->helperText('Toggle to mark the room as available or unavailable.'), // Helper text for guidance
-                        \Filament\Forms\Components\SpatieMediaLibraryFileUpload::make('image')
-                            ->columnSpanFull()
-                            ->panelLayout('grid')
-                            ->moveFiles()
-                            ->collection('room-photos')
-                            ->label('Room Photos') // Custom label for clarity
-                            ->helperText('Upload an image for the room.') // Helper text for guidance
-                            ->multiple()
-                            ->image()
-                            ->responsiveImages()
-                            ->columns(2),
+
                     ]),
+
 
             ])
             ->columns(2); // Use a two-column layout for better organization
@@ -197,10 +197,6 @@ class RoomResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->label(trans('frontOffice.room.nameLabel')),
-                // Tables\Columns\TextColumn::make('id')
-                //     ->label('ID'),
-                // Tables\Columns\TextColumn::make('hotel.name')
-                //     ->label(trans('frontOffice.room.hotelLabel')),
                 Tables\Columns\TextColumn::make('roomType.name')
                     ->icon('tabler-files')
                     ->color('primary')
@@ -221,16 +217,6 @@ class RoomResource extends Resource
                     ->label(trans('frontOffice.room.priceLabel'))
                     ->money()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('is_available')
-                    ->summarize(
-
-                        Count::make()
-                            ->prefix('Total available: ')
-                            ->query(fn(QueryBuilder $query) => $query->where('is_available', true))
-                            ->label(trans('frontOffice.room.availableLabel'))
-                    )
-                    ->label(trans('frontOffice.room.availableLabel'))
-                    ->boolean(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label(trans('frontOffice.room.deletedAtLabel'))
                     ->icon('tabler-calendar')

@@ -3,7 +3,9 @@
 namespace App\Providers\Filament;
 
 use App\Filament\FrontOffice\Pages\AvailableRoomDashboard;
+use App\Filament\FrontOffice\Pages\ProfilePage;
 use App\Models\Vendor\Hotel;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -33,14 +35,18 @@ class FrontOfficePanelProvider extends PanelProvider
             ->databaseNotifications()
             ->viteTheme('resources/css/filament/frontOffice/theme.css')
             ->login()
+            ->passwordReset()
+            ->emailVerification()
+            ->profile(ProfilePage::class, isSimple: false)
             ->maxContentWidth(MaxWidth::Full)
             ->font('Poppins')
             ->sidebarCollapsibleOnDesktop()
-            ->darkModeBrandLogo(asset('images/logo/suite_sense_logo_dark.png'))
-            ->brandLogo(asset('images/logo/suite_sense_logo_white.png'))
+            ->darkModeBrandLogo(asset('images/logo/suitify_logo_dark.svg'))
+            ->brandLogo(asset('images/logo/suitify_logo_white.svg'))
             ->brandLogoHeight('2rem')
-            ->favicon(asset('images/logo/suite_sense_logo_icon.png'))
+            ->favicon(asset('images/logo/suitify_logo_icon.svg'))
             ->plugins([
+                FilamentShieldPlugin::make(),
                 \Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin::make(),
                 \Saade\FilamentFullCalendar\FilamentFullCalendarPlugin::make(),
             ])
@@ -62,6 +68,7 @@ class FrontOfficePanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/FrontOffice/Resources'), for: 'App\\Filament\\FrontOffice\\Resources')
             ->discoverPages(in: app_path('Filament/FrontOffice/Pages'), for: 'App\\Filament\\FrontOffice\\Pages')
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->pages([
                 // AvailableRoomDashboard::class,
                 // Pages\Dashboard::class,
@@ -85,7 +92,9 @@ class FrontOfficePanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->tenant(Hotel::class, slugAttribute: 'name', ownershipRelationship: 'hotel')
-            ->tenantRoutePrefix('hotel');
+            ->tenantMiddleware([
+                \BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant::class,
+            ], isPersistent: true)
+            ->tenant(Hotel::class, slugAttribute: 'name');
     }
 }

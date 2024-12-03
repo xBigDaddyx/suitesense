@@ -2,12 +2,19 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\EmailVerificationPrompt as AuthEmailVerificationPrompt;
+use App\Filament\Pages\Auth\Login;
+use App\Filament\Pages\Tenancy\EditHotelProfile;
+use App\Filament\Pages\Tenancy\RegisterHotel;
 use App\Http\Middleware\VerifyLicenseKey;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Models\Vendor\Hotel;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Pages;
+use Filament\Pages\Auth\EmailVerification\EmailVerificationPrompt;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Assets\Css;
@@ -29,12 +36,14 @@ class VendorPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('manage')
-            ->path('manage')
+            ->id('vendor')
+            ->path('vendor')
             ->viteTheme('resources/css/filament/manage/theme.css')
             // ->domain('manage.suitify.cloud')
             ->databaseNotifications()
-            ->login()
+            ->login(Login::class)
+            ->emailVerification(AuthEmailVerificationPrompt::class, true)
+            ->passwordReset()
             ->registration()
             ->maxContentWidth(MaxWidth::Full)
             ->font('Poppins')
@@ -44,6 +53,7 @@ class VendorPanelProvider extends PanelProvider
             ->brandLogoHeight('2rem')
             ->favicon(asset('images/logo/suite_sense_logo_icon.png'))
             ->plugins([
+                FilamentShieldPlugin::make(),
                 \Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin::make(),
                 \Saade\FilamentFullCalendar\FilamentFullCalendarPlugin::make(),
             ])
@@ -103,9 +113,19 @@ class VendorPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                VerifyLicenseKey::class,
+                // VerifyLicenseKey::class,
             ])
-            ->tenant(Hotel::class, slugAttribute: 'name', ownershipRelationship: 'latestHotel')
-            ->tenantRoutePrefix('hotel');
+            ->tenantMenuItems([
+                'register' => MenuItem::make()->label('Register new hotel')
+                    ->visible(fn(): bool => auth()->user()->can('create_hotel')),
+                // ...
+            ])
+            ->tenantRegistration(RegisterHotel::class)
+            ->tenantProfile(EditHotelProfile::class)
+            ->tenantMiddleware([
+                \BezhanSalleh\FilamentShield\Middleware\SyncShieldTenant::class,
+            ], isPersistent: true)
+            ->tenant(Hotel::class, 'slug');
+        // ->tenantRoutePrefix('hotel');
     }
 }

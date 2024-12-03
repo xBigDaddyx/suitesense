@@ -71,7 +71,6 @@
                 @endif
             </ul>
         </div>
-
         <button wire:navigate
             href="{{ route('filament.frontOffice.resources.rooms.manageReservations', ['record' => $room->id, 'tenant' => \Filament\Facades\Filament::getTenant()]) }}"
             class="w-full mt-6 bg-primary hover:bg-primary text-white py-3 rounded-lg transition font-medium">

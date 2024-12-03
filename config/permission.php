@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Role;
+
 return [
 
     'models' => [
@@ -24,7 +26,7 @@ return [
          * `Spatie\Permission\Contracts\Role` contract.
          */
 
-        'role' => Spatie\Permission\Models\Role::class,
+        'role' => Role::class,
 
     ],
 
@@ -120,7 +122,7 @@ return [
      * (view the latest version of this package's migration file)
      */
 
-    'teams' => false,
+    'teams' => true,
 
     /*
      * Passport Client Credentials Grant

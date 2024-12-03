@@ -9,7 +9,7 @@ use Filament\Resources\Pages\ViewRecord;
 class ViewRoom extends ViewRecord
 {
     protected static string $resource = RoomResource::class;
-
+    protected static string $view = 'filament.front-office.resources.room-resource.pages.view-room';
     public function hasCombinedRelationManagerTabsWithContent(): bool
     {
         return true;

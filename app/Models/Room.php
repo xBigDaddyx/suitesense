@@ -16,9 +16,17 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Vendor\Hotel;
+use App\ModelStates\RoomState;
+use App\States\Room\Available;
+use App\States\Room\Cleaning;
+use App\States\Room\Maintenance;
+use App\States\Room\Occupied;
+use App\States\Room\Reserved;
+use Spatie\ModelStates\HasStates;
 
 class Room extends Model implements HasMedia
 {
+    use HasStates;
     use HasFactory;
     use HasUuids;
     use SoftDeletes;
@@ -35,6 +43,7 @@ class Room extends Model implements HasMedia
         });
     }
     protected $fillable = [
+        'state',
         'status',
         'hotel_id',
         'name',
@@ -46,6 +55,7 @@ class Room extends Model implements HasMedia
     protected $casts = [
         'price' => 'decimal:2',
         'is_available' => 'boolean',
+        'state' => RoomState::class,
     ];
     public function registerMediaConversions(?Media $media = null): void
     {
@@ -148,10 +158,23 @@ class Room extends Model implements HasMedia
     }
     public function scopeAvailable(Builder $query): Builder
     {
-        return $query->where('is_available', true)
-            ->whereDoesntHave('reservations', function ($query) {
-                $query->where('status', 'confirmed')->orWhere('status', 'pending');  // Mengasumsikan status reservasi 'confirmed'
-            });
+        return $query->whereState('state', Available::class);
+    }
+    public function scopeCleaning(Builder $query): Builder
+    {
+        return $query->whereState('state', Cleaning::class);
+    }
+    public function scopeMaintenance(Builder $query): Builder
+    {
+        return $query->whereState('state', Maintenance::class);
+    }
+    public function scopeOccupied(Builder $query): Builder
+    {
+        return $query->whereState('state', Occupied::class);
+    }
+    public function scopeReserved(Builder $query): Builder
+    {
+        return $query->whereState('state', Reserved::class);
     }
     public function hotel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

@@ -5,6 +5,8 @@ namespace App\Filament\FrontOffice\Resources\RoomResource\Widgets;
 use App\Enums\RoomStatus;
 use App\Models\Reservation;
 use App\Models\Room;
+use App\States\Guest\CheckedIn;
+use App\States\Reservation\Confirmed;
 use Carbon\Carbon;
 use Filament\Support\RawJs;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
@@ -43,7 +45,7 @@ class OccupancyRateChart extends ApexChartWidget
             $totalRoomDays = $totalRooms * $daysInMonth;
 
             // Hitung jumlah hari kamar terisi selama bulan ini
-            $occupiedRoomDays = Reservation::whereIn('status', ['confirmed', 'completed'])
+            $occupiedRoomDays = Reservation::whereState('state', Confirmed::class)->orWhereState('state', CheckedIn::class)
                 ->where(function ($query) use ($year, $month) {
                     $query->whereBetween('check_in', [
                         Carbon::create($year, $month, 1)->startOfDay(),
@@ -70,7 +72,7 @@ class OccupancyRateChart extends ApexChartWidget
             $occupancyRate = $totalRoomDays > 0 ? ($occupiedRoomDays / $totalRoomDays) * 100 : 0;
 
             // Hitung total reservasi
-            $totalReservations = Reservation::whereIn('status', ['confirmed', 'completed'])
+            $totalReservations = Reservation::whereState('state', Confirmed::class)->orWhereState('state', CheckedIn::class)
                 ->whereBetween('check_in', [
                     Carbon::create($year, $month, 1)->startOfDay(),
                     Carbon::create($year, $month)->endOfMonth(),

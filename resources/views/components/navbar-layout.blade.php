@@ -1,22 +1,20 @@
  <!-- start header -->
- <header>
+ <header class="no-print">
      <!-- start navigation -->
      <nav class="navbar navbar-expand-lg header-light bg-white header-reverse glass-effect">
          <div class="container-fluid">
              <div class="col-auto col-lg-2 me-lg-0 me-auto">
                  <a class="navbar-brand" href="/">
-                     <img src="{{ asset('images/logo/suite_sense_logo_white.png') }}"
-                         data-at2x="{{ asset('images/logo/suite_sense_logo_white.png') }}" alt=""
-                         class="default-logo">
-                     <img src="{{ asset('images/logo/suite_sense_logo_white.png') }}"
-                         data-at2x="{{ asset('images/logo/suite_sense_logo_white.png') }}" alt="ff"
-                         class="alt-logo">
-                     <img src="{{ asset('images/logo/suite_sense_logo_white.png') }}"
-                         data-at2x="{{ asset('images/logo/suite_sense_logo_white.png') }}" alt=""
+                     <img src="{{ asset('images/logo/suitify_logo_white.svg') }}"
+                         data-at2x="{{ asset('images/logo/suitify_logo_white.svg') }}" alt="" class="default-logo">
+                     <img src="{{ asset('images/logo/suitify_logo_white.svg') }}"
+                         data-at2x="{{ asset('images/logo/suitify_logo_white.svg') }}" alt="ff" class="alt-logo">
+                     <img src="{{ asset('images/logo/suitify_logo_white.svg') }}"
+                         data-at2x="{{ asset('images/logo/suitify_logo_white.svg') }}" alt=""
                          class="mobile-logo">
                  </a>
              </div>
-             {{-- <div class="col-auto ms-auto md-ms-0 menu-order position-static">
+             <div class="col-auto ms-auto md-ms-0 menu-order position-static">
                  <button class="navbar-toggler float-start" type="button" data-bs-toggle="collapse"
                      data-bs-target="#navbarNav" aria-controls="navbarNav" aria-label="Toggle navigation">
                      <span class="navbar-toggler-line"></span>
@@ -26,11 +24,11 @@
                  </button>
                  <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                      <ul class="navbar-nav alt-font">
-                         <li class="nav-item"><a href="demo-branding-agency.html" class="nav-link">Home</a></li>
-                         <li class="nav-item"><a href="demo-branding-agency-about.html" class="nav-link">Agency</a>
+                         <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
+                         <li class="nav-item"><a href="/pricing" class="nav-link">Pricing</a>
                          </li>
-                         <li class="nav-item dropdown dropdown-with-icon-style02">
-                             <a href="demo-branding-agency-services.html" class="nav-link">Services</a>
+                         {{-- <li class="nav-item dropdown dropdown-with-icon-style02">
+                             <a href="demo-branding-agency-services.html" class="nav-link">Features</a>
                              <i class="fa-solid fa-angle-down dropdown-toggle" id="navbarDropdownMenuLink"
                                  role="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
                              <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -43,10 +41,9 @@
                                  <li><a href="demo-branding-agency-services-detail.html"><i
                                              class="bi bi-bag-heart text-dark-gray"></i>eCommerce solutions</a></li>
                              </ul>
-                         </li>
-                         <li class="nav-item"><a href="demo-branding-agency-portfolio.html"
-                                 class="nav-link">Portfolio</a></li>
-                         <li class="nav-item"><a href="demo-branding-agency-contact.html" class="nav-link">Contact</a>
+                         </li> --}}
+                         <li class="nav-item"><a href="/features" class="nav-link">Features</a></li>
+                         <li class="nav-item"><a href="/contact" class="nav-link">Contact</a>
                          </li>
                      </ul>
                  </div>
@@ -63,7 +60,7 @@
                          </a>
                      </div>
                  </div>
-             </div> --}}
+             </div>
          </div>
      </nav>
      <!-- end navigation -->

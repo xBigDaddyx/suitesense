@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Events\CancelReservationEvent;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Listeners\CancelReservationListener;
 use App\Models\Payment;
 use App\Models\Reservation;
@@ -36,6 +38,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        app(\Spatie\Permission\PermissionRegistrar::class)
+            ->setPermissionClass(Permission::class)
+            ->setRoleClass(Role::class);
+
+
         Configuration::setXenditKey(env('XENDIT_SECRET_KEY'));
         if (env('APP_ENV') == 'production') {
             URL::forceScheme('https');
@@ -52,7 +59,9 @@ class AppServiceProvider extends ServiceProvider
 
         Page::$reportValidationErrorUsing = function (ValidationException $exception) {
             Notification::make()
-                ->title($exception->getMessage())
+                ->icon('tabler-alert-circle')
+                ->title('Form Validation Error')
+                ->body($exception->getMessage())
                 ->color('danger')
                 ->danger()
                 ->send();

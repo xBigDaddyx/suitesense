@@ -1,4 +1,4 @@
-<header class="absolute top-0 left-0 right-0 flex items-center justify-between p-4">
+<header class="absolute top-0 left-0 right-0 flex items-center justify-between p-4 no-print">
     <!-- Logo on the Left -->
     <div class="flex items-center ml-8">
         <!-- Your SVG Logo -->

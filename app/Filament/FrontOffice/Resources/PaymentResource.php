@@ -6,9 +6,17 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Enums\PaymentType;
 use App\Events\PaidPaymentEvent;
+use App\Events\PayPaymentEvent;
 use App\Filament\FrontOffice\Resources\PaymentResource\Pages;
 use App\Filament\FrontOffice\Resources\PaymentResource\RelationManagers;
+use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\Reservation;
+use App\States\Payment\Paid;
+use App\States\Payment\Pending;
+use App\States\Reservation\Confirmed;
+use Carbon\Carbon;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -16,13 +24,19 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables;
+use Filament\Tables\Columns\Summarizers\Count;
+use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Spatie\Browsershot\Browsershot;
 use stdClass;
+use function Spatie\LaravelPdf\Support\pdf;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class PaymentResource extends Resource
 {
@@ -51,7 +65,7 @@ class PaymentResource extends Resource
         return [
             'Room Type' => $record->reservation->room->roomType->name,
             'Total Price' => trans('frontOffice.room.pricePrefix') . ' ' . $record->reservation->total_price,
-            'status' => $record->status
+            'status' => ucfirst($record->state)
         ];
     }
     public static function getGlobalSearchResultActions(Model $record): array
@@ -117,10 +131,10 @@ class PaymentResource extends Resource
                 Forms\Components\TextInput::make('amount')
                     ->required()
                     ->numeric(),
-                Forms\Components\Select::make('status')
-                    ->options(collect(PaymentStatus::cases())->mapWithKeys(fn($status) => [
-                        $status->value => $status->label(),
-                    ])->toArray()),
+                // Forms\Components\Select::make('status')
+                //     ->options(collect(PaymentStatus::cases())->mapWithKeys(fn($status) => [
+                //         $status->value => $status->label(),
+                //     ])->toArray()),
             ]);
     }
 
@@ -148,14 +162,20 @@ class PaymentResource extends Resource
                     ->badge()
                     ->weight(FontWeight::Bold)
                     ->label(trans('frontOffice.payment.numberLabel')),
-                Tables\Columns\TextColumn::make('reservation.number')
-                    ->copyable()
-                    ->icon('tabler-file-certificate')
-                    ->badge()
-                    ->weight(FontWeight::Bold)
-                    ->label(trans('frontOffice.payment.reservationNumberLabel')),
-                Tables\Columns\TextColumn::make('reservation.room.roomType.name')
-                    ->label(trans('frontOffice.reservation.roomTypeLabel')),
+                // Tables\Columns\TextColumn::make('reservation.number')
+                //     ->copyable()
+                //     ->icon('tabler-file-certificate')
+                //     ->badge()
+                //     ->weight(FontWeight::Bold)
+                //     ->label(trans('frontOffice.payment.reservationNumberLabel')),
+                // Tables\Columns\TextColumn::make('invoice.number')
+                //     ->copyable()
+                //     ->icon('tabler-file-certificate')
+                //     ->badge()
+                //     ->weight(FontWeight::Bold)
+                //     ->label(trans('frontOffice.payment.invoiceNumberLabel')),
+                // Tables\Columns\TextColumn::make('reservation.room.roomType.name')
+                //     ->label(trans('frontOffice.reservation.roomTypeLabel')),
 
                 Tables\Columns\TextColumn::make('type')
                     ->label(trans('frontOffice.payment.typeLabel'))
@@ -163,69 +183,98 @@ class PaymentResource extends Resource
                     ->color(fn(string $state): string => PaymentType::from($state)->color())
                     ->icon(fn(string $state): string => PaymentType::from($state)->icon())
                     ->searchable(),
-                Tables\Columns\TextColumn::make('method')
+                Tables\Columns\TextColumn::make('payment_method')
                     ->label(trans('frontOffice.payment.methodLabel'))
                     ->badge()
                     ->color(fn(string $state): string => PaymentMethod::from($state)->color())
                     ->icon(fn(string $state): string => PaymentMethod::from($state)->icon())
                     ->searchable(),
-                Tables\Columns\TextColumn::make('reservation.total_price')
+                Tables\Columns\TextColumn::make('total_amount')
                     ->weight(FontWeight::Bold)
                     ->color('info')
                     ->label(trans('frontOffice.reservation.totalPriceLabel'))
                     ->formatStateUsing(fn(string $state): string => trans('frontOffice.room.pricePrefix') . ' ' . number_format($state, 2)),
-                Tables\Columns\TextColumn::make('amount')
+                Tables\Columns\TextColumn::make('paid_amount')
+
                     ->color('danger')
-                    ->label(trans('frontOffice.payment.amountLabel'))
+                    ->label(trans('frontOffice.payment.paidAmountLabel'))
                     ->formatStateUsing(fn(string $state): string => trans('frontOffice.room.pricePrefix') . ' ' . number_format($state, 2))
                     ->weight(FontWeight::Bold)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status')
+                Tables\Columns\TextColumn::make('state')
+                    ->formatStateUsing(fn(Model $record): string => $record->state->label())
                     ->label(trans('frontOffice.payment.statusLabel'))
                     ->badge()
                     ->badge()
-                    ->color(fn(string $state): string => PaymentStatus::from($state)->color())
-                    ->icon(fn(string $state): string => PaymentStatus::from($state)->icon())
+                    ->color(fn(Model $record): string => $record->state->color())
+                    ->icon(fn(Model $record): string => $record->state->icon())
                     ->searchable(),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_by')
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_by')
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_by')
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
+                    ->hidden(fn(Model $record): bool => $record->state === Paid::class || $record->state !== Pending::class)
                     ->button()
                     ->authorize(fn(Model $record): bool => auth()->user()->can('update', $record)),
-                Tables\Actions\Action::make('paid')
+                Tables\Actions\Action::make('view_invoice')
+                    // ->hidden(true)
+                    ->modalHeading('')
+                    ->slideOver()
                     ->button()
-                    ->color('success')
-                    ->icon('tabler-check')
+                    ->icon('tabler-file-search')
+                    // ->action(function (Model $record) {
+                    //     $record = $record->invoice;
+                    //     return pdf()
+                    //         ->view('filament.front-office.pages.view-invoice', compact('record'))
+                    //         ->name('invoice-' . Carbon::now()->format('d-m-y') . '.pdf');
+                    // return Browsershot::url(route('invoice.view', ['tenant' => Filament::getTenant(), 'record' => $record->invoice]))->save(storage_path('/app/public/reports/example.pdf'));
+                    // return new Res($file, 200, array(
+                    //     'Content-Type' => 'application/pdf',
+                    //     'Content-Disposition' =>  'attachment; filename="ticket.pdf"'
+                    // ));
+                    // }),
+                    // ->modalContent(fn(Model $record): View => view(
+                    //     'filament.front-office.pages.view-invoice',
+                    //     ['record' => $record->invoice],
+                    // ))->modalSubmitAction(false)
+                    // ->modalCloseButton(false)
+                    // ->modalCancelAction(false),
+
+                    ->url(function (Model $value) {
+
+                        return route('invoice.view', ['tenant' => Filament::getTenant(), 'record' => $value->reservation->invoices->first()]);
+                    })
+                    ->openUrlInNewTab()
+                    ->authorize(fn(Model $record): bool => auth()->user()->can('view_invoice', $record)),
+                Tables\Actions\Action::make('pay')
+                    ->visible(fn(Model $record): bool => $record->state->canTransitionTo(Paid::class))
+                    ->button()
+                    ->color('primary')
+                    ->icon('tabler-cash')
                     ->requiresConfirmation()
-                    ->action(function (Model $record) {
-                        event(new PaidPaymentEvent($record, auth()->user()));
+                    ->fillForm(fn(Model $record): array => [
+                        'paid_amount' => $record->paid_amount,
+                    ])
+                    ->form([
+                        Forms\Components\Select::make('payment_method')
+                            ->options(collect(PaymentMethod::cases())->mapWithKeys(fn($status) => [
+                                $status->value => $status->label(),
+                            ])->toArray())
+                            ->required(),
+                        Forms\Components\TextInput::make('paid_amount')
+                            ->label('Paid Amount')
+                            ->numeric()
+                            ->inputMode('decimal')
+                            ->required(),
+                    ])
+                    ->action(function (array $data, Model $record) {
+                        $record->state->transitionTo(Paid::class);
+                        $record->paid_at = Carbon::now();
+                        $record->reservation->state->transitionTo(Confirmed::class);
+                        $record->save();
                     })
                     ->authorize(fn(Model $record): bool => auth()->user()->can('paidPayment', $record)),
             ])

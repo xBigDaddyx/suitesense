@@ -14,8 +14,16 @@ class AdditionalFacility extends Model
     use Userstamps;
 
     protected $fillable = [
+        'unit',
         'name',
         'description',
         'price',
     ];
+    public function reservations(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Reservation::class)
+            ->using(ReservationFacility::class)
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
 }

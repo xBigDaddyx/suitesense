@@ -10,6 +10,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +22,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Wildside\Userstamps\Userstamps;
 
-class User extends Authenticatable implements FilamentUser, HasTenants, HasAvatar
+class User extends Authenticatable implements FilamentUser, HasTenants, HasAvatar, MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use Notifiable;
@@ -82,11 +83,11 @@ class User extends Authenticatable implements FilamentUser, HasTenants, HasAvata
 
     public function canAccessTenant(Model $tenant): bool
     {
-        return $this->hotels()->whereKey($tenant)->exists();
+        return $this->hotels()->whereKey($tenant)->exists() && $this->hasVerifiedEmail();
     }
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->hasVerifiedEmail();
+        return true;
     }
     public function getDefaultTenant(Panel $panel): ?Model
     {

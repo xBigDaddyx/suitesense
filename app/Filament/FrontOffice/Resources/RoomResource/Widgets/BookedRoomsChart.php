@@ -4,6 +4,8 @@ namespace App\Filament\FrontOffice\Resources\RoomResource\Widgets;
 
 use App\Models\Reservation;
 use App\Models\RoomType;
+use App\States\Reservation\CheckedIn;
+use App\States\Reservation\Confirmed;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Filament\Forms\Components\Select;
@@ -67,7 +69,7 @@ class BookedRoomsChart extends ApexChartWidget
             $data = Trend::query(
                 Reservation::join('rooms', 'reservations.room_id', '=', 'rooms.id')
                     ->join('room_types', 'rooms.room_type_id', '=', 'room_types.id')
-                    ->where('reservations.status', 'completed')
+                    ->whereState('reservations.state', Confirmed::class)
                     ->where('rooms.room_type_id', $selectedRoomTypes) // Filter berdasarkan tipe kamar yang dipilih
             )
                 ->between(
